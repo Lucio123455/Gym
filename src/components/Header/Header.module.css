@@ -1,0 +1,19 @@
+.header {
+    background-color: #000;
+    color: white;
+    padding: 1rem 1rem; /* Más altura (2rem top/bottom) y menos laterales */
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada */
+    min-height: 8rem; /* Altura mínima garantizada */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title {
+    margin: 0;
+    font-size: clamp(2.5rem, 5vw, 3.5rem); /* Título responsive */
+    letter-spacing: 0.05em; /* Mejor legibilidad */
+    line-height: 1.2; /* Espaciado vertical óptimo */
+}

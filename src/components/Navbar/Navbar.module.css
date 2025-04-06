@@ -1,0 +1,48 @@
+.navbar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background-color: #000000;
+    padding: 12px 0;
+    border-top: 1px solid #e1e1e1;
+}
+
+.navItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3px;
+    position: relative;
+}
+
+.navIcon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al tocar/hover */
+.navItem:hover .navIcon {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+/* Efecto activo minimalista */
+.navItem::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    width: 5px;
+    height: 5px;
+    background-color: #00FF00;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.navItem.active::after {
+    opacity: 1;
+}
