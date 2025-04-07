@@ -1,3 +1,8 @@
+# Archivos de entorno
+.env.local
+.env.development
+.env.production
+.env
 # Logs
 logs
 *.log

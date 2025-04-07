@@ -1,44 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../../../../firebase/config'; // Asegúrate de tener tu configuración de Firebase
 import Publicacion from '../Publicacion/Publicacion';
-import publi1 from '../../../../../assets/publicacion1.jpg';
-import publi2 from '../../../../../assets/publicacion2.jpg';
-
-const publicaciones = [
-    {
-        id: 1,
-        imagen: publi1,
-        descripcion: "¡Nueva clase de yoga los lunes y miércoles a las 8 AM!",
-        likes: 24,
-        fecha: "2023-11-15",
-        comentarios: [
-            "¡Genial! ¿Habrá clases los viernes también?",
-            "Yo me apunto ✨"
-        ],
-        autor: "Gimnasio Power"
-    },
-    {
-        id: 2,
-        imagen: publi2,
-        descripcion: "20% de descuento en paquetes de musculación.",
-        likes: 42,
-        fecha: "2023-11-10",
-        comentarios: [
-            "¿El descuento aplica para estudiantes?",
-            "Justo lo que necesitaba 💪"
-        ],
-        autor: "Gimnasio Power"
-    },
-];
+import styles from './Publicaciones.module.css'; // Asegúrate de tener tu CSS para estilos
 
 function Publicaciones() {
-    return (
-        <div>
-            {publicaciones.map((publicacion) => (
-                <Publicacion key={publicacion.id} publicacion={publicacion} />
-            ))}
-        </div>
-    );
-}
+  const [publicaciones, setPublicaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchPublicaciones = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'Publicaciones'));
+        const publicacionesData = [];
+        
+        querySnapshot.forEach((doc) => {
+          publicacionesData.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+
+        // Ordenar por fecha (asumiendo que tienes un campo 'fecha')
+        publicacionesData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        setPublicaciones(publicacionesData);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error al obtener publicaciones:", err);
+        setError("Error al cargar publicaciones");
+        setLoading(false);
+      }
+    };
+    
+    fetchPublicaciones();
+  }, []);
+
+  if (loading) {
+    return <div>Cargando publicaciones...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (publicaciones.length === 0) {
+    return <div>No hay publicaciones disponibles</div>;
+  }
+
+  return (
+    <div className={styles.publicacionesContainer}>
+      {publicaciones.map((publicacion) => (
+        <Publicacion key={publicacion.id} publicacion={publicacion} />
+      ))}
+    </div>
+  );
+}
 
 export default Publicaciones;

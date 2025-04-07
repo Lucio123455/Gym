@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth'; // Importamos useAuth
 import styles from './Navbar.module.css';
 import homeIcon from '../../assets/Home-Link.png';
 import entrenamientoIcon from '../../assets/Entrenamiento-Link.png';
 import chatIcon from '../../assets/Chat-Link.png';
 import perfilIcon from '../../assets/Perfil-Link.png';
+import adminIcon from '../../assets/Perfil-Link.png'; // Usamos misma imagen que perfil
 import homeIconColor from '../../assets/Home-Link-color.png';
 import entrenamientoIconColor from '../../assets/Entrenamiento-Link-color.png';   
 import chatIconColor from '../../assets/Chat-Link-color.png';
@@ -11,12 +13,21 @@ import perfilIconColor from '../../assets/Perfil-Link-color.png';
 
 export default function Navbar() {
   const location = useLocation();
-  const navItems = [
-    { path: "/", icon: homeIcon, iconActive: homeIconColor, label: "Home" },
-    { path: "/chat", icon: chatIcon, iconActive: chatIconColor, label: "Chat" },
-    { path: "/entrenamiento", icon: entrenamientoIcon, iconActive: entrenamientoIconColor, label: "Entrenamiento" },
-    { path: "/perfil", icon: perfilIcon, iconActive: perfilIconColor, label: "Perfil" }
-  ];
+  const { user } = useAuth();
+
+  // Definimos los items según el rol
+  const navItems = user?.role === 'admin' 
+    ? [
+        { path: "/", icon: homeIcon, iconActive: homeIconColor, label: "Home" },
+        { path: "/chat", icon: chatIcon, iconActive: chatIconColor, label: "Chat" },
+        { path: "/admin", icon: adminIcon, iconActive: perfilIconColor, label: "Admin" }
+      ]
+    : [
+        { path: "/", icon: homeIcon, iconActive: homeIconColor, label: "Home" },
+        { path: "/chat", icon: chatIcon, iconActive: chatIconColor, label: "Chat" },
+        { path: "/entrenamiento", icon: entrenamientoIcon, iconActive: entrenamientoIconColor, label: "Entrenamiento" },
+        { path: "/perfil", icon: perfilIcon, iconActive: perfilIconColor, label: "Perfil" }
+      ];
 
   return (
     <nav className={styles.navbar}>

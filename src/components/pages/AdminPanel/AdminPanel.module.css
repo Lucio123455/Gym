@@ -1,0 +1,131 @@
+/* Contenedor principal */
+.adminContainer {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Título */
+  .adminTitle {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+  }
+  
+  /* Información del usuario */
+  .adminUserInfo {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .adminUserInfo p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+  
+  /* Sección de funciones */
+  .adminFeatures {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .adminFeatures h3 {
+    color: #3498db;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    text-align: center;
+  }
+  
+  /* Botones de funciones */
+  .featureButton {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 1rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .featureButton:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+  }
+  
+  .featureButton:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Botón de cerrar sesión */
+  .adminLogoutButton {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .adminLogoutButton:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .adminContainer {
+      padding: 1rem;
+      margin: 1rem;
+    }
+    
+    .adminTitle {
+      font-size: 1.5rem;
+    }
+  }
+
+/* Agrega esto al final de tu archivo CSS */
+.formContainer {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Mejora para los botones de características */
+  .featureButton {
+    margin-bottom: 0.8rem;
+    transition: all 0.2s;
+  }
+  
+  .featureButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }

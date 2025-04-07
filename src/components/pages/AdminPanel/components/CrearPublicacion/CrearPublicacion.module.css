@@ -1,0 +1,88 @@
+.container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.container h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup label {
+    font-weight: 600;
+    color: #34495e;
+}
+
+.formGroup textarea {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.formGroup input[type="file"] {
+    padding: 0.5rem;
+}
+
+.imagePreview {
+    margin-top: 1rem;
+    max-width: 100%;
+}
+
+.imagePreview img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.submitButton {
+    background-color: #3498db;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submitButton:hover {
+    background-color: #2980b9;
+}
+
+.submitButton:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.error {
+    color: #e74c3c;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.success {
+    color: #27ae60;
+    text-align: center;
+    margin-bottom: 1rem;
+}
