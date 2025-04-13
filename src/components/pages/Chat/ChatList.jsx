@@ -59,8 +59,13 @@ export default function ChatList() {
         let contactsQuery;
         
         if (userRole === 'admin') {
-          contactsQuery = query(collection(db, 'users'));
+          // Admins ven todos los usuarios excepto ellos mismos
+          contactsQuery = query(
+            collection(db, 'users'),
+            where('dni', '!=', currentUser?.dni)  // Excluir al admin actual
+          );
         } else {
+          // Miembros ven solo admins
           contactsQuery = query(
             collection(db, 'users'),
             where('role', '==', 'admin')
