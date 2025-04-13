@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   collection, query, orderBy, onSnapshot, 
-  doc, getDoc, addDoc, serverTimestamp, updateDoc, setDoc , getDocs
+  doc, getDoc, addDoc, serverTimestamp, updateDoc, setDoc , getDocs, where
 } from 'firebase/firestore';
 import { db, auth } from '../../../firebase/config';
 import styles from './ChatList.module.css';
@@ -60,10 +60,7 @@ export default function ChatList() {
         
         if (userRole === 'admin') {
           // Admins ven todos los usuarios excepto ellos mismos
-          contactsQuery = query(
-            collection(db, 'users'),
-            where('dni', '!=', currentUser?.dni)  // Excluir al admin actual
-          );
+          contactsQuery = query(collection(db, 'users'));
         } else {
           // Miembros ven solo admins
           contactsQuery = query(
