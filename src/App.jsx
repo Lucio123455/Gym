@@ -3,7 +3,8 @@ import { useAuth } from './hooks/useAuth';
 import Header from './components/Header/Header.jsx';
 import Navbar from './components/Navbar/Navbar';
 import Home from './components/pages/Home/Home.jsx';
-import Chat from './components/pages/Chat/Chat.jsx';
+import ChatList from './components/pages/Chat/ChatList.jsx';
+import ChatWindow from './components/pages/Chat/ChatWindow.jsx'; 
 import Entrenamiento from './components/pages/Entrenamiento/Entrenamiento.jsx';
 import Perfil from './components/pages/Perfil/Perfil.jsx';
 import AuthGate from './components/AuthGate/AuthGate';
@@ -23,7 +24,9 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/chat" element={<Chat />} />
+            <Route path="/chat" element={<ChatList />} />
+            <Route path="/chat/:chatId" element={<ChatWindow />} />
+
             {user?.role === 'admin' ? (
               <Route path="/admin" element={<AdminPanel />} />
             ) : (

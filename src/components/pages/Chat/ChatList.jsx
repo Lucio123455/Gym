@@ -1,26 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db, auth } from '../../../firebase/config'; // Asegúrate de tener tu configuración de Firebase
-import styles from './Chat.module.css';
+import { useNavigate } from 'react-router-dom';
+import { 
+  collection, query, orderBy, onSnapshot, 
+  doc, getDoc, addDoc, serverTimestamp, updateDoc, setDoc , getDocs
+} from 'firebase/firestore';
+import { db, auth } from '../../../firebase/config';
+import styles from './ChatList.module.css';
 
-export default function Chat() {
+export default function ChatList() {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
+
+  // Función para generar un ID de chat único
+  const generateChatId = (dni1, dni2) => {
+    return [dni1, dni2].sort().join('_');
+  };
+  
+  const handleGoToChat = async (contactDni) => {
+    if (!currentUser?.dni) return;
+    
+    const chatId = generateChatId(currentUser.dni, contactDni);
+    
+    try {
+      // Esto crea el documento si no existe, o lo actualiza si existe
+      await setDoc(doc(db, 'chats', chatId), {
+        participants: [currentUser.dni, contactDni],
+        lastUpdated: serverTimestamp()
+      }, { merge: true }); // ← Esto es clave
+      
+      navigate(`/chat/${chatId}`);
+    } catch (error) {
+      console.error("Error al inicializar chat:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Verificar usuario autenticado
         auth.onAuthStateChanged(async (user) => {
           if (user) {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
-            setCurrentUser(userDoc.data());
-            fetchContacts(userDoc.data().role);
+            if (userDoc.exists()) {
+              setCurrentUser(userDoc.data());
+              fetchContacts(userDoc.data().role);
+            }
           }
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setLoading(false);
       }
     };
 
@@ -29,10 +59,8 @@ export default function Chat() {
         let contactsQuery;
         
         if (userRole === 'admin') {
-          // Admins ven todos los usuarios
           contactsQuery = query(collection(db, 'users'));
         } else {
-          // Members ven solo admins
           contactsQuery = query(
             collection(db, 'users'),
             where('role', '==', 'admin')
@@ -41,16 +69,16 @@ export default function Chat() {
 
         const querySnapshot = await getDocs(contactsQuery);
         const contactsData = querySnapshot.docs
-          .filter(doc => doc.id !== auth.currentUser?.uid) // Excluir al usuario actual
+          .filter(doc => doc.id !== auth.currentUser?.uid)
           .map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
 
         setContacts(contactsData);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching contacts:", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -81,12 +109,15 @@ export default function Chat() {
               </div>
               <div className={styles.contactInfo}>
                 <h3>{contact.nombre || 'Usuario sin nombre'}</h3>
-                <p>{contact.email}</p>
+                <p>DNI: {contact.dni}</p>
                 <span className={`${styles.roleBadge} ${contact.role === 'admin' ? styles.adminBadge : styles.memberBadge}`}>
                   {contact.role === 'admin' ? 'Administrador' : 'Miembro'}
                 </span>
               </div>
-              <button className={styles.chatButton}>
+              <button 
+                className={styles.chatButton}
+                onClick={() => handleGoToChat(contact.dni)}
+              >
                 Ir al chat
               </button>
             </div>
