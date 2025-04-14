@@ -1,27 +1,39 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Header from './components/Header/Header.jsx';
 import Navbar from './components/Navbar/Navbar';
 import Home from './components/pages/Home/Home.jsx';
 import ChatList from './components/pages/Chat/ChatList.jsx';
-import ChatWindow from './components/pages/Chat/ChatWindow.jsx'; 
+import ChatWindow from './components/pages/Chat/ChatWindow/ChatWindow.jsx'; 
 import Entrenamiento from './components/pages/Entrenamiento/Entrenamiento.jsx';
 import Perfil from './components/pages/Perfil/Perfil.jsx';
 import AuthGate from './components/AuthGate/AuthGate';
 import AdminPanel from './components/pages/AdminPanel/AdminPanel';
 
+function AppWrapper() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
+
 function App() {
   const { user, loading } = useAuth();
+  const location = useLocation(); // ✅
+
+  const isChatWindow = location.pathname.startsWith('/chat/') && location.pathname !== '/chat';
 
   if (loading) return <div className="app-loading">Cargando...</div>;
 
   return (
-    <Router>
+    <>
       {!user ? (
         <AuthGate />
       ) : (
         <>
-          <Header />
+          {!isChatWindow && <Header />}
+          
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/chat" element={<ChatList />} />
@@ -35,14 +47,15 @@ function App() {
                 <Route path="/perfil" element={<Perfil />} />
               </>
             )}
-            {/* Ruta de catch-all para evitar errores */}
+            
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <Navbar />
+
+          {!isChatWindow && <Navbar />}
         </>
       )}
-    </Router>
+    </>
   );
 }
 
-export default App;
+export default AppWrapper;

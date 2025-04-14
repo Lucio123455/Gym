@@ -4,10 +4,13 @@ import {
   collection, query, orderBy, onSnapshot, 
   doc, getDoc, addDoc, serverTimestamp, updateDoc, setDoc
 } from 'firebase/firestore';
-import { db, auth } from '../../../firebase/config';
+import { db, auth } from '../../../../firebase/config';
 import { IoIosArrowBack, IoIosSend } from 'react-icons/io';
 import { BsThreeDotsVertical, BsEmojiSmile, BsCamera } from 'react-icons/bs';
 import styles from './ChatWindow.module.css';
+import MessageInput from './MessageInput/MessageInput';
+import MessagesArea from './MessagesArea/MessageArea';
+import ChatHeader from './ChatHeader/ChatHeader';
 
 export default function ChatWindow() {
   const { chatId } = useParams();
@@ -56,35 +59,63 @@ export default function ChatWindow() {
   }, [chatId]);
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !currentUserDni) return;
-
+    if (!newMessage.trim() || !currentUserDni) {
+      console.log("Mensaje vacío o dni del usuario no definido.");
+      return;
+    }
+  
     try {
-      // Crear chat si no existe (con merge)
-      await setDoc(doc(db, 'chats', chatId), {
-        participants: chatId.split('_'),
-        lastUpdated: serverTimestamp()
-      }, { merge: true });
-
-      // Añadir mensaje
+      console.log("Obteniendo referencia al chat:", chatId);
+      const chatRef = doc(db, 'chats', chatId);
+      const chatSnap = await getDoc(chatRef);
+  
+      if (!chatSnap.exists()) {
+        console.error("El chat no existe aún.");
+        return;
+      }
+  
+      const chatData = chatSnap.data();
+      console.log("Datos del chat:", chatData);
+  
+      const participants = chatData.participants;
+      console.log("Participantes del chat:", participants);
+  
+      const senderIndex = -1 * participants.indexOf(currentUserDni);
+      console.log("Índice del usuario actual:", senderIndex);
+      
+      if (senderIndex === -1) {
+        console.error("El usuario actual no está en la conversación.");
+        return;
+      }
+  
+      const readStatus = [true, true];
+      readStatus[1 - senderIndex] = false;
+      console.log("Nuevo estado de lectura:", readStatus);
+  
+      console.log("Agregando mensaje...");
       await addDoc(collection(db, 'chats', chatId, 'messages'), {
         senderDni: currentUserDni,
         text: newMessage,
         timestamp: serverTimestamp(),
         read: false
       });
-
-      // Actualizar último mensaje
-      await updateDoc(doc(db, 'chats', chatId), {
+      console.log("Mensaje agregado.");
+  
+      console.log("Actualizando documento del chat...");
+      await updateDoc(chatRef, {
         lastMessage: newMessage,
-        lastUpdated: serverTimestamp()
+        lastUpdated: serverTimestamp(),
+        readStatus: readStatus
       });
-
+      console.log("Chat actualizado.");
+  
       setNewMessage('');
+      console.log("Mensaje limpiado en el input.");
     } catch (error) {
       console.error("Error al enviar mensaje:", error);
     }
   };
-
+  
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -107,72 +138,24 @@ export default function ChatWindow() {
 
   return (
     <div className={styles.chatContainer}>
-      {/* Header estilo Instagram */}
-      <div className={styles.chatHeader}>
-        <button onClick={() => navigate(-1)} className={styles.backButton}>
-          <IoIosArrowBack size={24} />
-        </button>
-        <div className={styles.contactInfo}>
-          {contactInfo?.photoURL && (
-            <img src={contactInfo.photoURL} alt={contactInfo.displayName} className={styles.contactPhoto} />
-          )}
-          <h3>{contactInfo?.displayName || chatId.replace('_', ' ↔ ')}</h3>
-          <span className={styles.status}>En línea</span>
-        </div>
-        <button className={styles.menuButton}>
-          <BsThreeDotsVertical size={20} />
-        </button>
-      </div>
-
-      {/* Área de mensajes */}
-      <div className={styles.messagesArea}>
-        {messages.map(msg => (
-          <div 
-            key={msg.id} 
-            className={`${styles.messageBubble} ${
-              msg.senderDni === currentUserDni ? styles.sent : styles.received
-            }`}
-          >
-            <div className={styles.messageContent}>
-              <p>{msg.text}</p>
-              <span className={styles.messageTime}>
-                {formatTime(msg.timestamp)}
-                {msg.senderDni === currentUserDni && (
-                  <span className={styles.readStatus}>✓✓</span>
-                )}
-              </span>
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input de mensaje */}
-      <div className={styles.messageInputContainer}>
-        <button className={styles.attachmentButton}>
-          <BsCamera size={24} />
-        </button>
-        <div className={styles.inputWrapper}>
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Mensaje..."
-            className={styles.messageInput}
+          <ChatHeader 
+            contactInfo={contactInfo} 
+            chatId={chatId} 
+            onBack={() => navigate(-1)} 
           />
-          <button className={styles.emojiButton}>
-            <BsEmojiSmile size={20} />
-          </button>
+          
+          <MessagesArea 
+            messages={messages} 
+            currentUserDni={currentUserDni} 
+            formatTime={formatTime} 
+          />
+          
+          <MessageInput
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            handleKeyPress={handleKeyPress}
+            sendMessage={sendMessage}
+          />
         </div>
-        <button 
-          onClick={sendMessage} 
-          className={styles.sendButton}
-          disabled={!newMessage.trim()}
-        >
-          <IoIosSend size={24} />
-        </button>
-      </div>
-    </div>
-  );
+      );
 }

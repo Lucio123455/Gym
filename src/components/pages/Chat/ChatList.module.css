@@ -1,126 +1,48 @@
-/* Chat.module.css */
 .chatContainer {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding-bottom: 100px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding-bottom: 100px;
+}
+
+.chatHeader {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.contactsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.noContacts {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 30px;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  padding: 50px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #3498db;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .chatHeader {
-    color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 25px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ecf0f1;
-  }
-  
-  .contactsList {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .contactCard {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .contactCard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .contactAvatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #3498db;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-right: 15px;
-  }
-  
-  .contactInfo {
-    flex: 1;
-  }
-  
-  .contactInfo h3 {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 1.1rem;
-  }
-  
-  .contactInfo p {
-    margin: 5px 0 0 0;
-    color: #7f8c8d;
-    font-size: 0.9rem;
-  }
-  
-  .roleBadge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    margin-top: 5px;
-  }
-  
-  .adminBadge {
-    background-color: #e3f2fd;
-    color: #1976d2;
-  }
-  
-  .memberBadge {
-    background-color: #e8f5e9;
-    color: #388e3c;
-  }
-  
-  .chatButton {
-    background-color: #c1ff72;
-    color: #2c3e50;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .chatButton:hover {
-    background-color: #a8e65c;
-  }
-  
-  .noContacts {
-    text-align: center;
-    color: #7f8c8d;
-    padding: 30px;
-  }
-  
-  .loadingContainer {
-    display: flex;
-    justify-content: center;
-    padding: 50px;
-  }
-  
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: #3498db;
-    animation: spin 1s ease-in-out infinite;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+}

@@ -1,0 +1,119 @@
+/* Estilo principal del header */
+.chatHeader {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e6e6e6;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 60px;
+  box-sizing: border-box;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Botón de retroceso */
+.backButton {
+  background: none;
+  border: none;
+  margin-right: 12px;
+  color: #262626;
+  padding: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.backButton:hover {
+  transform: scale(1.1);
+}
+
+.backButton:active {
+  transform: scale(0.95);
+}
+
+/* Información del contacto */
+.contactInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  min-width: 0; /* Permite que el texto se trunque correctamente */
+}
+
+.contactPhoto {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+  border: 1px solid #efefef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.contactInfo h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Estado del contacto (opcional) */
+.status {
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-left: 6px;
+  font-weight: 400;
+}
+
+/* Botón de menú */
+.menuButton {
+  background: none;
+  border: none;
+  color: #262626;
+  padding: 8px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menuButton:hover {
+  color: #0095f6;
+  transform: scale(1.1);
+}
+
+.menuButton:active {
+  transform: scale(0.95);
+}
+
+/* Efecto de borde inferior sutil */
+.chatHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+}
+
+/* Ajustes para móviles */
+@media (max-width: 480px) {
+  .chatHeader {
+    padding: 10px 12px;
+    height: 56px;
+  }
+  
+  .contactPhoto {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .contactInfo h3 {
+    font-size: 15px;
+  }
+}
