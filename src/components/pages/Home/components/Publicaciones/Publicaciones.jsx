@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../../../../firebase/config'; // Asegúrate de tener tu configuración de Firebase
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../../../../../firebase/config'; // Asegúrate de tener tu configuración de Firebase
 import Publicacion from '../Publicacion/Publicacion';
 import styles from './Publicaciones.module.css'; // Asegúrate de tener tu CSS para estilos
 
-function Publicaciones() {
+
+function Publicaciones({usuario}) {
   const [publicaciones, setPublicaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+
+  console.log(usuario)
 
   useEffect(() => {
     const fetchPublicaciones = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'Publicaciones'));
         const publicacionesData = [];
-        
+
         querySnapshot.forEach((doc) => {
           publicacionesData.push({
             id: doc.id,
@@ -24,7 +28,7 @@ function Publicaciones() {
 
         // Ordenar por fecha (asumiendo que tienes un campo 'fecha')
         publicacionesData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        
+
         setPublicaciones(publicacionesData);
         setLoading(false);
       } catch (err) {
@@ -33,7 +37,7 @@ function Publicaciones() {
         setLoading(false);
       }
     };
-    
+
     fetchPublicaciones();
   }, []);
 
@@ -52,7 +56,7 @@ function Publicaciones() {
   return (
     <div className={styles.publicacionesContainer}>
       {publicaciones.map((publicacion) => (
-        <Publicacion key={publicacion.id} publicacion={publicacion} />
+        <Publicacion key={publicacion.id} publicacion={publicacion} usuario={usuario} />
       ))}
     </div>
   );

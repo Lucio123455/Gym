@@ -273,14 +273,14 @@ const AgregarComentario = ({
 
 // ---------------- COMPONENTE PRINCIPAL ----------------
 
-function Publicacion({ publicacion }) {
+function Publicacion({ publicacion , usuario} ) {
     const [nuevoComentario, setNuevoComentario] = useState('');
     const [mostrarComentarios, setMostrarComentarios] = useState(false);
     const [animarComentarios, setAnimarComentarios] = useState(false);
     const [loadingComentario, setLoadingComentario] = useState(false);
     const [comentariosLocal, setComentariosLocal] = useState(publicacion.comentarios || []);
 
-    const [usuario, setUsuario] = useState(null);
+    
 
     const eliminarComentario = async (index) => {
         const confirmado = await confirmarEliminacion('¿Eliminar este comentario?', 'Esta acción no se puede deshacer.');
@@ -306,18 +306,7 @@ function Publicacion({ publicacion }) {
       
       
 
-    useEffect(() => {
-        const cargarUsuario = async () => {
-            const user = auth.currentUser;
-            if (user) {
-                const docRef = doc(db, 'users', user.uid);
-                const userSnap = await getDoc(docRef);
-                setUsuario(userSnap.data());
-            }
-        };
-
-        cargarUsuario();
-    }, []);
+    
 
     const eliminarPublicacion = async () => {
         const confirmado = await confirmarEliminacion('¿Eliminar publicación?', 'Esta acción eliminará la publicación por completo.');
