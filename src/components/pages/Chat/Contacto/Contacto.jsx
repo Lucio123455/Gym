@@ -41,8 +41,13 @@ export default function Contacto({ contact, onChat }) {
       <div className={styles.contactInfo}>
         <h3>{contact.nombre || 'Usuario sin nombre'}</h3>
         <p className={styles.lastMessage}>
-          {lastMessage ? lastMessage : 'Sin mensajes aún'}
+          {lastMessage
+            ? lastMessage.length > 30
+              ? `${lastMessage.slice(0, 30)}...`
+              : lastMessage
+            : 'Sin mensajes aún'}
         </p>
+
       </div>
 
       {hasUnread && <div className={styles.unreadDot}></div>}

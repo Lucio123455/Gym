@@ -5,8 +5,6 @@ import {
   doc, getDoc, addDoc, serverTimestamp, updateDoc, setDoc
 } from 'firebase/firestore';
 import { db, auth } from '../../../../firebase/config';
-import { IoIosArrowBack, IoIosSend } from 'react-icons/io';
-import { BsThreeDotsVertical, BsEmojiSmile, BsCamera } from 'react-icons/bs';
 import styles from './ChatWindow.module.css';
 import MessageInput from './MessageInput/MessageInput';
 import MessagesArea from './MessagesArea/MessageArea';
@@ -19,13 +17,7 @@ export default function ChatWindow() {
   const [loading, setLoading] = useState(true);
   const [currentUserDni, setCurrentUserDni] = useState('');
   const [newMessage, setNewMessage] = useState('');
-  const [contactInfo, setContactInfo] = useState(null);
-  const messagesEndRef = useRef(null);
-
-  // Auto-scroll al final de los mensajes
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const [contactInfo, setContactInfo] = useState(null);  
 
   useEffect(() => {
     const fetchUserAndContact = async () => {

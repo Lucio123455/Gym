@@ -9,6 +9,7 @@ import Entrenamiento from './components/pages/Entrenamiento/Entrenamiento.jsx';
 import Perfil from './components/pages/Perfil/Perfil.jsx';
 import AuthGate from './components/AuthGate/AuthGate';
 import AdminPanel from './components/pages/AdminPanel/AdminPanel';
+import Loading from './components/Loading/Loading.jsx'; // 💡 Importa el nuevo loader
 
 function AppWrapper() {
   return (
@@ -20,11 +21,11 @@ function AppWrapper() {
 
 function App() {
   const { user, loading } = useAuth();
-  const location = useLocation(); // ✅
+  const location = useLocation();
 
   const isChatWindow = location.pathname.startsWith('/chat/') && location.pathname !== '/chat';
 
-  if (loading) return <div className="app-loading">Cargando...</div>;
+  if (loading) return <Loading />; // 🎯 Nuevo loader aplicado
 
   return (
     <>

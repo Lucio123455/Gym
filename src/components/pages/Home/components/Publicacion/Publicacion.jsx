@@ -4,10 +4,12 @@ import {
     setDoc,
     arrayUnion,
     getDoc,
-    updateDoc
+    updateDoc,
+    deleteDoc
 } from 'firebase/firestore';
 import { db, auth } from '../../../../../firebase/config';
 import styles from './Publicacion.module.css';
+import { confirmarEliminacion, mostrarExito, mostrarError } from '../../../../../utils/swal.js';
 
 
 // ---------------- COMPONENTES AUXILIARES ----------------
@@ -109,7 +111,7 @@ const Responder = ({ comentarioIndex, publicacionId, setComentariosLocal }) => {
 
 
 
-const Encabezado = ({ autor, fecha }) => (
+const Encabezado = ({ usuario, eliminarPublicacion, fecha }) => (
     <div className={styles.encabezado}>
         <div className={styles.autorInfo}>
             <img
@@ -122,6 +124,11 @@ const Encabezado = ({ autor, fecha }) => (
         <span className={styles.fecha}>
             {new Date(fecha).toLocaleDateString()}
         </span>
+        {usuario?.role === 'admin' && (
+            <button className={styles.botonEliminar} onClick={eliminarPublicacion}>
+                Eliminar
+            </button>
+        )}
     </div>
 );
 
@@ -145,7 +152,8 @@ const Comentarios = ({
     refContenedor,
     publicacionId,
     setComentariosLocal,
-    usuario // 👈 nuevo
+    usuario,
+    eliminarComentario
 }) => (
     comentarios.length > 0 && (
         <div className={styles.comentarios}>
@@ -175,6 +183,16 @@ const Comentarios = ({
                                         <span className={styles.fechaComentario}>
                                             {new Date(comentario.fecha).toLocaleDateString('es-AR')}
                                         </span>
+
+                                        {usuario?.role === 'admin' && (
+                                            <button
+                                                className={styles.eliminarComentario}
+                                                onClick={() => eliminarComentario(index)}
+                                                title="Eliminar comentario"
+                                            >
+                                                ✖
+                                            </button>
+                                        )}
                                     </div>
                                     <p className={styles.textoComentario}>{comentario.texto}</p>
 
@@ -264,6 +282,30 @@ function Publicacion({ publicacion }) {
 
     const [usuario, setUsuario] = useState(null);
 
+    const eliminarComentario = async (index) => {
+        const confirmado = await confirmarEliminacion('¿Eliminar este comentario?', 'Esta acción no se puede deshacer.');
+        if (!confirmado) return;
+      
+        try {
+          const publicacionRef = doc(db, 'Publicaciones', publicacion.id);
+          const publicacionSnap = await getDoc(publicacionRef);
+          const data = publicacionSnap.data();
+          const comentariosActuales = Array.isArray(data?.comentarios) ? data.comentarios : [];
+      
+          const comentariosActualizados = comentariosActuales.filter((_, i) => i !== index);
+      
+          await setDoc(publicacionRef, { comentarios: comentariosActualizados }, { merge: true });
+          await mostrarExito('Comentario eliminado');
+          window.location.reload();
+        } catch (error) {
+          console.error("Error al eliminar comentario:", error);
+          mostrarError('Hubo un problema al eliminar el comentario.');
+        }
+      };
+      
+      
+      
+
     useEffect(() => {
         const cargarUsuario = async () => {
             const user = auth.currentUser;
@@ -277,6 +319,20 @@ function Publicacion({ publicacion }) {
         cargarUsuario();
     }, []);
 
+    const eliminarPublicacion = async () => {
+        const confirmado = await confirmarEliminacion('¿Eliminar publicación?', 'Esta acción eliminará la publicación por completo.');
+        if (!confirmado) return;
+      
+        try {
+          await deleteDoc(doc(db, 'Publicaciones', publicacion.id));
+          await mostrarExito('Publicación eliminada');
+          window.location.reload();
+        } catch (error) {
+          console.error("Error al eliminar publicación:", error);
+          mostrarError('Ocurrió un error al eliminar la publicación.');
+        }
+      };
+      
 
 
     const currentUser = auth.currentUser;
@@ -341,7 +397,7 @@ function Publicacion({ publicacion }) {
 
     return (
         <div className={styles.publicacionContainer}>
-            <Encabezado autor={publicacion.autor} fecha={publicacion.fecha} />
+            <Encabezado usuario={usuario} eliminarPublicacion={eliminarPublicacion} fecha={publicacion.fecha} />
             <ImagenPublicacion
                 src={publicacion.imagen}
                 alt={`Publicación de ${publicacion.autor}`}
@@ -356,6 +412,7 @@ function Publicacion({ publicacion }) {
                 publicacionId={publicacion.id}
                 setComentariosLocal={setComentariosLocal}
                 usuario={usuario} // 👈 agregado
+                eliminarComentario={eliminarComentario}
             />
             <AgregarComentario
                 nuevoComentario={nuevoComentario}

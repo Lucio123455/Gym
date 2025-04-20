@@ -29,7 +29,6 @@ export default function AdminPanel() {
           
           <div className={styles.adminFeatures}>
             <h3>Funciones administrativas:</h3>
-            <button className={styles.featureButton}>Gestionar usuarios</button>
             
             <button 
               className={styles.featureButton}
@@ -38,8 +37,6 @@ export default function AdminPanel() {
               {showCreateForm ? 'Ocultar formulario' : 'Crear publicaciones'}
             </button>
             
-            <button className={styles.featureButton}>Ver estadísticas</button>
-            <button className={styles.featureButton}>Configurar sistema</button>
           </div>
 
           {/* Mostrar el formulario solo cuando showCreateForm es true */}

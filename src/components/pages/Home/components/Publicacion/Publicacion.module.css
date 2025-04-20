@@ -259,6 +259,43 @@
     object-fit: cover;
     border-radius: 50%;
   }
+
+  .fechaYBoton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .botonEliminar {
+    background-color: #e63946;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .botonEliminar:hover {
+    background-color: #c9182c;
+  }
+  
+  .eliminarComentario {
+    background: none;
+    border: none;
+    color: #e63946;
+    font-size: 0.9rem;
+    margin-left: auto;
+    cursor: pointer;
+    padding: 0 4px;
+    transition: color 0.2s ease;
+  }
+  
+  .eliminarComentario:hover {
+    color: #ff4d4d;
+  }
+  
   
 
   
