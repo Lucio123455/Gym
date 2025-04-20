@@ -1,81 +1,157 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     doc,
-    updateDoc,
     setDoc,
     arrayUnion,
-    arrayRemove,
-    increment,
     getDoc
 } from 'firebase/firestore';
 import { db, auth } from '../../../../../firebase/config';
 import styles from './Publicacion.module.css';
 
+const Encabezado = ({ autor, fecha }) => (
+    <div className={styles.encabezado}>
+        <div className={styles.autorInfo}>
+            <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzPs0ng1OihF-_SsKH3o2j2ThKJa21zWYlmg&s"
+                alt="Avatar del autor"
+                className={styles.avatar}
+            />
+            <span className={styles.nombreAutor}>Will Power Gym</span>
+        </div>
+        <span className={styles.fecha}>
+            {new Date(fecha).toLocaleDateString()}
+        </span>
+    </div>
+);
+
+const ImagenPublicacion = ({ src, alt }) => (
+    <div className={styles.contenidoImagen}>
+        <img src={src} className={styles.imagen} alt={alt} />
+    </div>
+);
+
+const Descripcion = ({ texto }) => (
+    <div className={styles.descripcion}>
+        <span>{texto}</span>
+    </div>
+);
+
+const Comentarios = ({
+    comentarios,
+    mostrar,
+    setMostrar,
+    animar,
+    refContenedor
+}) => (
+    comentarios.length > 0 && (
+        <div className={styles.comentarios}>
+            {!mostrar ? (
+                <button
+                    className={styles.verComentarios}
+                    onClick={() => setMostrar(true)}
+                >
+                    Ver los {comentarios.length} comentarios
+                </button>
+            ) : (
+                <>
+                    <div
+                        ref={refContenedor}
+                        className={`${styles.comentariosAnimados} ${animar ? styles.activo : ''}`}
+                    >
+                        {comentarios.map((comentario, index) => (
+                            <div key={index} className={styles.comentario}>
+                                <span className={styles.usuarioComentario}>
+                                    {comentario.usuarioNombre}
+                                </span>
+                                <span>{comentario.texto}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <button
+                        className={styles.ocultarComentarios}
+                        onClick={() => setMostrar(false)}
+                    >
+                        Ocultar comentarios
+                    </button>
+                </>
+            )}
+        </div>
+    )
+);
+
+const AgregarComentario = ({
+    nuevoComentario,
+    setNuevoComentario,
+    agregarComentario,
+    loading
+}) => (
+    <div className={styles.agregarComentario}>
+        <input
+            type="text"
+            placeholder="Añade un comentario..."
+            value={nuevoComentario}
+            onChange={(e) => setNuevoComentario(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && agregarComentario()}
+            disabled={loading}
+        />
+        {loading ? (
+            <span className={styles.publicando}>Publicando...</span>
+        ) : (
+            <button
+                className={styles.botonPublicar}
+                onClick={agregarComentario}
+                disabled={!nuevoComentario.trim()}
+            >
+                Publicar
+            </button>
+        )}
+    </div>
+);
+
+
 function Publicacion({ publicacion }) {
     const [nuevoComentario, setNuevoComentario] = useState('');
     const [mostrarComentarios, setMostrarComentarios] = useState(false);
+    const [animarComentarios, setAnimarComentarios] = useState(false);
+    const [loadingComentario, setLoadingComentario] = useState(false);
+    const [comentariosLocal, setComentariosLocal] = useState(publicacion.comentarios || []);
+
     const currentUser = auth.currentUser;
+    const comentariosRef = useRef(null);
 
-    // Verificar si el usuario ya dio like
-    const usuarioDioLike = publicacion.likesUsuarios?.includes(currentUser?.uid) || false;
-
-    const handleLike = async () => {
-        if (!currentUser) return;
-
-        const publicacionRef = doc(db, 'Publicaciones', publicacion.id);
-
-        try {
-            // Verificar si el documento existe
-            const docSnap = await getDoc(publicacionRef);
-
-            if (!docSnap.exists()) {
-                // Crear documento si no existe
-                await setDoc(publicacionRef, {
-                    likes: usuarioDioLike ? 0 : 1,
-                    likesUsuarios: usuarioDioLike ? [] : [currentUser.uid],
-                    comentarios: publicacion.comentarios || [],
-                    autor: publicacion.autor || 'Anónimo',
-                    imagen: publicacion.imagen || '',
-                    descripcion: publicacion.descripcion || '',
-                    fecha: publicacion.fecha || new Date().toISOString()
-                });
-                return;
-            }
-
-            if (usuarioDioLike) {
-                await updateDoc(publicacionRef, {
-                    likes: increment(-1),
-                    likesUsuarios: arrayRemove(currentUser.uid)
-                });
-            } else {
-                await updateDoc(publicacionRef, {
-                    likes: increment(1),
-                    likesUsuarios: arrayUnion(currentUser.uid)
-                });
-            }
-        } catch (error) {
-            console.error("Error al actualizar like:", error);
+    useEffect(() => {
+        if (mostrarComentarios) {
+            const timeout = setTimeout(() => setAnimarComentarios(true), 10);
+            return () => clearTimeout(timeout);
+        } else {
+            setAnimarComentarios(false);
         }
-    };
+    }, [mostrarComentarios]);
 
     const agregarComentario = async () => {
         if (!nuevoComentario.trim() || !currentUser) return;
 
+        setLoadingComentario(true);
         const publicacionRef = doc(db, 'Publicaciones', publicacion.id);
-        const comentario = {
-            texto: nuevoComentario,
-            usuarioId: currentUser.uid,
-            usuarioNombre: currentUser.email || 'Anónimo',
-            fecha: new Date().toISOString()
-        };
 
         try {
-            // Usar setDoc con merge: true para crear el documento si no existe
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            const userData = userDocSnap.exists() ? userDocSnap.data() : {};
+            const nombreUsuario = userData.nombre || 'Anónimo';
+
+            const nuevo = {
+                texto: nuevoComentario,
+                usuarioId: currentUser.uid,
+                usuarioNombre: nombreUsuario,
+                fecha: new Date().toISOString()
+            };
+
+            // Agregamos el comentario a la UI de inmediato
+            setComentariosLocal(prev => [...prev, nuevo]);
+
             await setDoc(publicacionRef, {
-                comentarios: arrayUnion(comentario),
-                // Campos por defecto si es nuevo documento
-                likes: publicacion.likes || 0,
-                likesUsuarios: publicacion.likesUsuarios || [],
+                comentarios: arrayUnion(nuevo),
                 autor: publicacion.autor || 'Anónimo',
                 imagen: publicacion.imagen || '',
                 descripcion: publicacion.descripcion || '',
@@ -85,109 +161,36 @@ function Publicacion({ publicacion }) {
             setNuevoComentario('');
         } catch (error) {
             console.error("Error al agregar comentario:", error);
+        } finally {
+            setLoadingComentario(false);
         }
     };
 
-    // Resto del componente permanece igual...
     return (
         <div className={styles.publicacionContainer}>
-            {/* Encabezado */}
-            <div className={styles.encabezado}>
-                <div className={styles.autorInfo}>
-                    <div className={styles.avatar}></div>
-                    <span className={styles.nombreAutor}>{publicacion.autor}</span>
-                </div>
-                <span className={styles.fecha}>
-                    {new Date(publicacion.fecha).toLocaleDateString()}
-                </span>
-            </div>
-
-            {/* Imagen */}
-            <div className={styles.contenidoImagen}>
-                <img
-                    src={publicacion.imagen}
-                    className={styles.imagen}
-                    alt={`Publicación de ${publicacion.autor}`}
-                />
-            </div>
-
-            {/* Acciones */}
-            <div className={styles.acciones}>
-                <button
-                    className={styles.botonAccion}
-                    onClick={handleLike}
-                    style={{ color: usuarioDioLike ? 'red' : 'inherit' }}
-                >
-                    {usuarioDioLike ? '❤️' : '🤍'}
-                </button>
-                <button
-                    className={styles.botonAccion}
-                    onClick={() => setMostrarComentarios(!mostrarComentarios)}
-                >
-                    💬
-                </button>
-            </div>
-
-            {/* Likes */}
-            <div className={styles.likes}>
-                <span>{publicacion.likes || 0} me gusta</span>
-            </div>
-
-            {/* Descripción */}
-            <div className={styles.descripcion}>
-                <span>{publicacion.descripcion}</span>
-            </div>
-
-            {/* Comentarios */}
-            {publicacion.comentarios?.length > 0 && (
-                <div className={styles.comentarios}>
-                    {!mostrarComentarios ? (
-                        <button
-                            className={styles.verComentarios}
-                            onClick={() => setMostrarComentarios(true)}
-                        >
-                            Ver los {publicacion.comentarios.length} comentarios
-                        </button>
-                    ) : (
-                        <>
-                            {publicacion.comentarios.map((comentario, index) => (
-                                <div key={index} className={styles.comentario}>
-                                    <span className={styles.usuarioComentario}>
-                                        {comentario.usuarioNombre}
-                                    </span>
-                                    <span>{comentario.texto}</span>
-                                </div>
-                            ))}
-                            <button
-                                className={styles.ocultarComentarios}
-                                onClick={() => setMostrarComentarios(false)}
-                            >
-                                Ocultar comentarios
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
-
-            {/* Añadir comentario */}
-            <div className={styles.agregarComentario}>
-                <input
-                    type="text"
-                    placeholder="Añade un comentario..."
-                    value={nuevoComentario}
-                    onChange={(e) => setNuevoComentario(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && agregarComentario()}
-                />
-                <button
-                    className={styles.botonPublicar}
-                    onClick={agregarComentario}
-                    disabled={!nuevoComentario.trim()}
-                >
-                    Publicar
-                </button>
-            </div>
+            <Encabezado autor={publicacion.autor} fecha={publicacion.fecha} />
+            <ImagenPublicacion
+                src={publicacion.imagen}
+                alt={`Publicación de ${publicacion.autor}`}
+            />
+            <Descripcion texto={publicacion.descripcion} />
+            <Comentarios
+                comentarios={comentariosLocal}
+                mostrar={mostrarComentarios}
+                setMostrar={setMostrarComentarios}
+                animar={animarComentarios}
+                refContenedor={comentariosRef}
+            />
+            <AgregarComentario
+                nuevoComentario={nuevoComentario}
+                setNuevoComentario={setNuevoComentario}
+                agregarComentario={agregarComentario}
+                loading={loadingComentario}
+            />
         </div>
     );
 }
 
 export default Publicacion;
+
+
