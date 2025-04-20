@@ -144,7 +144,8 @@ const Comentarios = ({
     animar,
     refContenedor,
     publicacionId,
-    setComentariosLocal
+    setComentariosLocal,
+    usuario // 👈 nuevo
 }) => (
     comentarios.length > 0 && (
         <div className={styles.comentarios}>
@@ -178,14 +179,35 @@ const Comentarios = ({
                                     <p className={styles.textoComentario}>{comentario.texto}</p>
 
                                     {comentario.respuestas?.map((resp, i) => (
-                                        <p key={i} className={styles.respuestaTexto}>↳ {resp}</p>
+                                        <div key={i} className={styles.comentario}>
+                                            <div className={styles.avatarComentario}>
+                                                <img
+                                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzPs0ng1OihF-_SsKH3o2j2ThKJa21zWYlmg&s"
+                                                    alt="Avatar"
+                                                    className={styles.avatarComentarioImg}
+                                                />
+                                            </div>
+                                            <div className={styles.cuerpoComentario}>
+                                                <div className={styles.comentarioHeader}>
+                                                    <span className={styles.usuarioComentario}>Will Power Gym</span>
+                                                    <span className={styles.fechaComentario}>
+                                                        {new Date().toLocaleDateString('es-AR')}
+                                                    </span>
+                                                </div>
+                                                <p className={styles.textoComentario}>{resp}</p>
+                                            </div>
+                                        </div>
                                     ))}
 
-                                    <Responder
-                                        comentarioIndex={index}
-                                        publicacionId={publicacionId}
-                                        setComentariosLocal={setComentariosLocal}
-                                    />
+
+                                    {usuario?.role === 'admin' && (
+                                        <Responder
+                                            comentarioIndex={index}
+                                            publicacionId={publicacionId}
+                                            setComentariosLocal={setComentariosLocal}
+                                        />
+                                    )}
+
                                 </div>
                             </div>
                         ))}
@@ -240,7 +262,25 @@ function Publicacion({ publicacion }) {
     const [loadingComentario, setLoadingComentario] = useState(false);
     const [comentariosLocal, setComentariosLocal] = useState(publicacion.comentarios || []);
 
+    const [usuario, setUsuario] = useState(null);
+
+    useEffect(() => {
+        const cargarUsuario = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const docRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(docRef);
+                setUsuario(userSnap.data());
+            }
+        };
+
+        cargarUsuario();
+    }, []);
+
+
+
     const currentUser = auth.currentUser;
+    console.log(currentUser)
     const comentariosRef = useRef(null);
 
     useEffect(() => {
@@ -315,6 +355,7 @@ function Publicacion({ publicacion }) {
                 refContenedor={comentariosRef}
                 publicacionId={publicacion.id}
                 setComentariosLocal={setComentariosLocal}
+                usuario={usuario} // 👈 agregado
             />
             <AgregarComentario
                 nuevoComentario={nuevoComentario}
