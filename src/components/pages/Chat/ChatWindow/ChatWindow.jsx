@@ -28,35 +28,58 @@ export default function ChatWindow() {
   }, [messages]);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      const getUserDni = async () => {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        setCurrentUserDni(userDoc.data()?.dni || '');
-        
-        // Obtener info del contacto
-        const contactDni = chatId.split('_').find(dni => dni !== userDoc.data()?.dni);
-        const contactDoc = await getDoc(doc(db, 'users', contactDni));
-        setContactInfo(contactDoc.data());
-      };
-      getUserDni();
-    }
-
+    const fetchUserAndContact = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+  
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      const dni = userDoc.data()?.dni || '';
+      setCurrentUserDni(dni);
+  
+      const contactDni = chatId.split('_').find(d => d !== dni);
+      const contactDoc = await getDoc(doc(db, 'users', contactDni));
+      setContactInfo(contactDoc.data());
+    };
+  
+    fetchUserAndContact();
+  }, [chatId]);
+  
+  useEffect(() => {
+    if (!currentUserDni) return;
+  
     const messagesRef = collection(db, 'chats', chatId, 'messages');
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+  
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
       const msgs = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate() // Convertir a Date object
+        timestamp: doc.data().timestamp?.toDate()
       }));
       setMessages(msgs);
       setLoading(false);
+  
+      // 🔄 Marcar como leído
+      const chatRef = doc(db, 'chats', chatId);
+      const chatSnap = await getDoc(chatRef);
+  
+      if (chatSnap.exists()) {
+        const { participants, readStatus = [false, false] } = chatSnap.data();
+        const index = participants.indexOf(currentUserDni);
+  
+        if (index !== -1 && readStatus[index] === false) {
+          const updated = [...readStatus];
+          updated[index] = true;
+  
+          await updateDoc(chatRef, { readStatus: updated });
+          console.log("🔄 Marcado como leído en tiempo real:", updated);
+        }
+      }
     });
-
+  
     return () => unsubscribe();
-  }, [chatId]);
+  }, [chatId, currentUserDni]);
+  
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !currentUserDni) {
@@ -79,8 +102,10 @@ export default function ChatWindow() {
   
       const participants = chatData.participants;
       console.log("Participantes del chat:", participants);
-  
-      const senderIndex = -1 * participants.indexOf(currentUserDni);
+      
+      console.log(currentUserDni, participants)
+
+      const senderIndex = participants.indexOf(currentUserDni);
       console.log("Índice del usuario actual:", senderIndex);
       
       if (senderIndex === -1) {
@@ -135,8 +160,8 @@ export default function ChatWindow() {
       </div>
     );
   }
-
   return (
+
     <div className={styles.chatContainer}>
           <ChatHeader 
             contactInfo={contactInfo} 

@@ -3,8 +3,7 @@
     flex: 1;
     padding: 16px;
     overflow-y: auto;
-    background-color: #fafafa;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAAA+UlEQVQ4y+3UMUoDQRTG8Z8psJBUKTyAR7ATvIBgYSM2Np7AE3gAG8HGwkKwsLCwEBQJgqCQwkJQJIiQxWJ3J7vJbLKFH3y8efPm+5+ZNzPvj1qjM7iHd3jAeXQ2jXbgHl5hF8fwBq9wGJ1Noxd4jT3YwjO8w0l0No0e4Q0OYAeO4Ahe4Q1OorNpdB/vcRn7cAMfcRWdTaMbeIv72Ie7+Izr6Gwa3cBb3Mc+3MFnXEdn0+g63uIh9uEevuI2OptGl/AGj7EP9/ENd9HZNPoLzVwhSSgz+TwAAAAASUVORK5CYII=');
+    background-color: #ffffff;
     background-attachment: fixed;
     padding-bottom: 80px; /* Espacio para el input */
   }
