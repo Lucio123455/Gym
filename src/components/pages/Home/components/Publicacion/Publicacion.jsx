@@ -3,10 +3,111 @@ import {
     doc,
     setDoc,
     arrayUnion,
-    getDoc
+    getDoc,
+    updateDoc
 } from 'firebase/firestore';
 import { db, auth } from '../../../../../firebase/config';
 import styles from './Publicacion.module.css';
+
+
+// ---------------- COMPONENTES AUXILIARES ----------------
+
+
+const Responder = ({ comentarioIndex, publicacionId, setComentariosLocal }) => {
+    const [respuesta, setRespuesta] = useState('');
+    const [enviando, setEnviando] = useState(false);
+    const [mostrarInput, setMostrarInput] = useState(false);
+    const inputRef = useRef(null);
+
+    // Cierra el input si se hace click fuera
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (inputRef.current && !inputRef.current.contains(e.target)) {
+                setMostrarInput(false);
+                setRespuesta('');
+            }
+        };
+
+        if (mostrarInput) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [mostrarInput]);
+
+    const handleResponder = async () => {
+        if (!respuesta.trim()) return;
+        setEnviando(true);
+
+        const publicacionRef = doc(db, 'Publicaciones', publicacionId);
+
+        try {
+            const publicacionSnap = await getDoc(publicacionRef);
+            const data = publicacionSnap.exists() ? publicacionSnap.data() : {};
+            const comentariosActuales = Array.isArray(data?.comentarios) ? data.comentarios : [];
+
+            const actualizado = [...comentariosActuales];
+            const comentario = actualizado[comentarioIndex];
+
+            if (!comentario) throw new Error("Comentario no encontrado.");
+
+            const respuestasActuales = Array.isArray(comentario.respuestas) ? comentario.respuestas : [];
+            const nuevoComentario = {
+                ...comentario,
+                respuestas: [...respuestasActuales, respuesta]
+            };
+
+            actualizado[comentarioIndex] = nuevoComentario;
+
+            await setDoc(publicacionRef, { comentarios: actualizado }, { merge: true });
+
+            setComentariosLocal(actualizado);
+            setRespuesta('');
+            setMostrarInput(false);
+        } catch (e) {
+            console.error("Error al responder:", e);
+        } finally {
+            setEnviando(false);
+        }
+    };
+
+    return (
+        <div className={styles.responderContainer} ref={inputRef}>
+            {!mostrarInput ? (
+                <button
+                    className={styles.verComentarios}
+                    onClick={() => setMostrarInput(true)}
+                >
+                    Responder
+                </button>
+            ) : (
+                <div
+                    className={`${styles.responderAnimado} ${mostrarInput ? styles.activo : ''}`}
+                >
+                    <input
+                        type="text"
+                        placeholder="Responder..."
+                        value={respuesta}
+                        onChange={(e) => setRespuesta(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleResponder()}
+                        disabled={enviando}
+                        autoFocus
+                    />
+                    <button className={styles.botonPublicar}
+                        onClick={handleResponder}
+                        disabled={!respuesta.trim() || enviando}
+                    >
+                        {enviando ? '...' : 'Enviar'}
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+
 
 const Encabezado = ({ autor, fecha }) => (
     <div className={styles.encabezado}>
@@ -41,7 +142,9 @@ const Comentarios = ({
     mostrar,
     setMostrar,
     animar,
-    refContenedor
+    refContenedor,
+    publicacionId,
+    setComentariosLocal
 }) => (
     comentarios.length > 0 && (
         <div className={styles.comentarios}>
@@ -60,10 +163,30 @@ const Comentarios = ({
                     >
                         {comentarios.map((comentario, index) => (
                             <div key={index} className={styles.comentario}>
-                                <span className={styles.usuarioComentario}>
-                                    {comentario.usuarioNombre}
-                                </span>
-                                <span>{comentario.texto}</span>
+                                <div className={styles.avatarComentario}>
+                                    {comentario.usuarioNombre?.[0] || 'U'}
+                                </div>
+                                <div className={styles.cuerpoComentario}>
+                                    <div className={styles.comentarioHeader}>
+                                        <span className={styles.usuarioComentario}>
+                                            {comentario.usuarioNombre}
+                                        </span>
+                                        <span className={styles.fechaComentario}>
+                                            {new Date(comentario.fecha).toLocaleDateString('es-AR')}
+                                        </span>
+                                    </div>
+                                    <p className={styles.textoComentario}>{comentario.texto}</p>
+
+                                    {comentario.respuestas?.map((resp, i) => (
+                                        <p key={i} className={styles.respuestaTexto}>↳ {resp}</p>
+                                    ))}
+
+                                    <Responder
+                                        comentarioIndex={index}
+                                        publicacionId={publicacionId}
+                                        setComentariosLocal={setComentariosLocal}
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -108,6 +231,7 @@ const AgregarComentario = ({
     </div>
 );
 
+// ---------------- COMPONENTE PRINCIPAL ----------------
 
 function Publicacion({ publicacion }) {
     const [nuevoComentario, setNuevoComentario] = useState('');
@@ -135,29 +259,37 @@ function Publicacion({ publicacion }) {
         const publicacionRef = doc(db, 'Publicaciones', publicacion.id);
 
         try {
+            // Obtener datos del usuario actual
             const userDocRef = doc(db, 'users', currentUser.uid);
             const userDocSnap = await getDoc(userDocRef);
             const userData = userDocSnap.exists() ? userDocSnap.data() : {};
             const nombreUsuario = userData.nombre || 'Anónimo';
 
+            // Crear comentario nuevo
             const nuevo = {
                 texto: nuevoComentario,
                 usuarioId: currentUser.uid,
                 usuarioNombre: nombreUsuario,
-                fecha: new Date().toISOString()
+                fecha: new Date().toISOString(),
+                respuestas: [] // importante para evitar sobrescribir luego
             };
 
-            // Agregamos el comentario a la UI de inmediato
-            setComentariosLocal(prev => [...prev, nuevo]);
+            // 🔽 Leer comentarios actuales desde Firestore
+            const publicacionSnap = await getDoc(publicacionRef);
+            const data = publicacionSnap.exists() ? publicacionSnap.data() : {};
+            const comentariosActuales = Array.isArray(data?.comentarios) ? data.comentarios : [];
 
+
+            // 🔽 Agregar el nuevo comentario al array completo
+            const comentariosActualizados = [...comentariosActuales, nuevo];
+
+            // 🔽 Guardar los comentarios actualizados
             await setDoc(publicacionRef, {
-                comentarios: arrayUnion(nuevo),
-                autor: publicacion.autor || 'Anónimo',
-                imagen: publicacion.imagen || '',
-                descripcion: publicacion.descripcion || '',
-                fecha: publicacion.fecha || new Date().toISOString()
+                comentarios: comentariosActualizados
             }, { merge: true });
 
+            // 🔽 Actualizar localmente
+            setComentariosLocal(comentariosActualizados);
             setNuevoComentario('');
         } catch (error) {
             console.error("Error al agregar comentario:", error);
@@ -165,6 +297,7 @@ function Publicacion({ publicacion }) {
             setLoadingComentario(false);
         }
     };
+
 
     return (
         <div className={styles.publicacionContainer}>
@@ -180,6 +313,8 @@ function Publicacion({ publicacion }) {
                 setMostrar={setMostrarComentarios}
                 animar={animarComentarios}
                 refContenedor={comentariosRef}
+                publicacionId={publicacion.id}
+                setComentariosLocal={setComentariosLocal}
             />
             <AgregarComentario
                 nuevoComentario={nuevoComentario}
@@ -192,5 +327,6 @@ function Publicacion({ publicacion }) {
 }
 
 export default Publicacion;
+
 
 
