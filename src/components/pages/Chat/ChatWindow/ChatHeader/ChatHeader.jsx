@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IoIosArrowBack } from 'react-icons/io';
 import { BsThreeDotsVertical } from 'react-icons/bs';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../../../../firebase/config';
 import styles from './ChatHeader.module.css';
 
@@ -15,21 +15,27 @@ const ChatHeader = ({ chatId, onBack }) => {
       const user = auth.currentUser;
       if (!user) return;
   
+      // Obtener dni actual desde el usuario logueado
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       const dniActual = userDoc.data()?.dni;
+      if (!dniActual) return;
   
+      // Determinar el DNI del contacto
       const [dni1, dni2] = chatId.split('_');
       const dniContacto = dni1 === dniActual ? dni2 : dni1;
-      
-      const contactoDoc = await getDoc(doc(db, 'users', dniContacto));
-      console.log(dniContacto)
-      console.log("insano uno",contactoDoc)
-      if (contactoDoc.exists()) {
-        const data = contactoDoc.data();
+  
+      // Buscar en Firestore al user cuyo campo 'dni' coincida con dniContacto
+      const q = query(collection(db, 'users'), where('dni', '==', dniContacto));
+      const snapshot = await getDocs(q);
+  
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
         console.log("Datos del contacto:", data);
         setNombreContacto(data.nombre?.trim() || dniContacto);
         setPhotoURL(data.photoURL || '');
         setStatus(data.status || null);
+      } else {
+        console.warn("No se encontró usuario con dni:", dniContacto);
       }
     };
   

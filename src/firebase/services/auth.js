@@ -46,7 +46,7 @@ export const register = async (userData) => {
     });
 
     // 3. Guardar datos adicionales en Firestore (rol automático como 'member')
-    await setDoc(doc(db, 'users',  userData.dni), {
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
       nombre: userData.nombre,
       dni: userData.dni,
       email: userData.email,
