@@ -5,6 +5,7 @@ import Publicaciones from './components/Publicaciones/Publicaciones';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../../firebase/config'; // Asegúrate de tener tu configuración de Firebase
 import { useState, useEffect } from 'react';
+
 function Home() {
     const [usuario, setUsuario] = useState(null);
 
@@ -20,6 +21,7 @@ function Home() {
 
         cargarUsuario();
     }, []);
+    
     return (
         
         <div>
