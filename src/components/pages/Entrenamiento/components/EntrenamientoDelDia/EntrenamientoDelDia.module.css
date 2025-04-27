@@ -1,0 +1,172 @@
+.topRow {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.rutinaNombre {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-left: 10px;
+}
+
+.recordatorio {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  border-radius: 20px;
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  position: relative;
+  text-align: center;
+}
+
+.descanso {
+  background: linear-gradient(135deg, #f0fff4 0%, #e0f7e9 100%);
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.icono {
+  font-size: 3.5rem;
+}
+
+.dia {
+  margin: 0;
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #2c3e50;
+  text-transform: capitalize;
+}
+
+.contenido {
+  margin-bottom: 2rem;
+}
+
+.ejercicio {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1b5e20;
+}
+
+.startButton {
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 28px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.startButton:hover {
+  background-color: #43a047;
+}
+
+.bottomSection {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.changeDayButton {
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #4caf50;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.changeDayButton:hover {
+  text-decoration: underline;
+}
+
+.diasLista {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.diaItem {
+  background-color: #e8f5e9;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.diaItem:hover {
+  background-color: #c8e6c9;
+}
+
+.loading {
+  text-align: center;
+  font-size: 20px;
+  padding: 40px;
+  color: #555;
+}
+
+
+
+.bottomSection {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.changeDayButton {
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #4caf50;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.changeDayButton:hover {
+  text-decoration: underline;
+}
+
+.diasLista {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.diaItem {
+  background-color: #e8f5e9;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.diaItem:hover {
+  background-color: #c8e6c9;
+}

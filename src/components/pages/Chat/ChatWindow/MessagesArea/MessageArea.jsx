@@ -9,7 +9,7 @@ const MessagesArea = ({ messages, currentUserDni, formatTime }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
+  console.log(messages)
   return (
     <div className={styles.messagesArea}>
       {messages.map(msg => (
