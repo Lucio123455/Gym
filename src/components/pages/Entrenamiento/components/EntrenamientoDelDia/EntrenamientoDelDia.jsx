@@ -122,12 +122,10 @@ export default function EntrenamientoDelDia() {
 
   return (
     <div className={`${styles.recordatorio} ${nombreDiaRutina === 'Descanso' ? styles.descanso : ''} ${styles.fadeIn}`}>
-
       <div className={styles.encabezado}>
         <span className={styles.icono}>{emojiMostrar}</span>
         <h1 className={styles.dia}>{diaActual.charAt(0).toUpperCase() + diaActual.slice(1)}</h1>
-
-        {/* Botón cambio arriba a la derecha */}
+  
         <button
           className={styles.changeDayIcon}
           onClick={() => setModoCambio(!modoCambio)}
@@ -136,24 +134,28 @@ export default function EntrenamientoDelDia() {
           🔄
         </button>
       </div>
-
+  
       <div className={styles.contenido}>
-        <p className={styles.ejercicio}>
-          {nombreDiaRutina === 'Descanso'
-            ? 'Hoy es tu día de descanso'
-            : `${diaActual === nombreHoy ? '¡Hoy toca:' : 'Harás:'} ${nombreDiaRutina}!`}
-        </p>
-
-        {nombreDiaRutina !== 'Descanso' && (
-          <button
-            className={styles.startButton}
-            onClick={() => navigate('/entrenamiento-dia')}
-          >
-            Comenzar Entrenamiento
-          </button>
+        {nombreDiaRutina === 'Descanso' ? (
+          <p className={styles.diaDescanso}>
+            Día de descanso
+          </p>
+        ) : (
+          <>
+            <p className={styles.ejercicio}>
+              {diaActual === nombreHoy ? '¡Hoy toca:' : 'Harás:'} {nombreDiaRutina}!
+            </p>
+  
+            <button
+              className={styles.startButton}
+              onClick={() => navigate('/entrenamiento-dia')}
+            >
+              Comenzar Entrenamiento
+            </button>
+          </>
         )}
       </div>
-
+  
       {modoCambio && (
         <div className={styles.diasLista}>
           {diasDisponibles.map(dia => (
@@ -169,6 +171,8 @@ export default function EntrenamientoDelDia() {
       )}
     </div>
   );
+  
+  
 }
 
 
