@@ -14,9 +14,6 @@ export default function EntrenamientoDelDia() {
   const [modoCambio, setModoCambio] = useState(false);
   const [diasDisponibles, setDiasDisponibles] = useState([]);
 
-  const emojisEntrenamiento = ['🔥', '🏋️', '⚡', '💪', '🎯'];
-  const emojiDescanso = '🛌';
-
   const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
   const hoy = new Date();
   const nombreHoy = diasSemana[hoy.getDay()];
@@ -110,12 +107,6 @@ export default function EntrenamientoDelDia() {
     fetchData();
   };
 
-  const emojiMostrar = nombreDiaRutina === 'Descanso'
-    ? emojiDescanso
-    : emojisEntrenamiento[Math.floor(Math.random() * emojisEntrenamiento.length)];
-
-  // Hasta acá todo igual...
-
   if (loading) {
     return <Loading />;
   }
@@ -123,9 +114,10 @@ export default function EntrenamientoDelDia() {
   return (
     <div className={`${styles.recordatorio} ${nombreDiaRutina === 'Descanso' ? styles.descanso : ''} ${styles.fadeIn}`}>
       <div className={styles.encabezado}>
-        <span className={styles.icono}>{emojiMostrar}</span>
+        {/* ❌ Eliminamos emoji grande */}
         <h1 className={styles.dia}>{diaActual.charAt(0).toUpperCase() + diaActual.slice(1)}</h1>
-  
+
+        {/* ✅ Mantenemos botón de cambio 🔄 */}
         <button
           className={styles.changeDayIcon}
           onClick={() => setModoCambio(!modoCambio)}
@@ -134,7 +126,7 @@ export default function EntrenamientoDelDia() {
           🔄
         </button>
       </div>
-  
+
       <div className={styles.contenido}>
         {nombreDiaRutina === 'Descanso' ? (
           <p className={styles.diaDescanso}>
@@ -145,7 +137,7 @@ export default function EntrenamientoDelDia() {
             <p className={styles.ejercicio}>
               {diaActual === nombreHoy ? '¡Hoy toca:' : 'Harás:'} {nombreDiaRutina}!
             </p>
-  
+
             <button
               className={styles.startButton}
               onClick={() => navigate('/entrenamiento-dia')}
@@ -155,7 +147,7 @@ export default function EntrenamientoDelDia() {
           </>
         )}
       </div>
-  
+
       {modoCambio && (
         <div className={styles.diasLista}>
           {diasDisponibles.map(dia => (
@@ -171,8 +163,6 @@ export default function EntrenamientoDelDia() {
       )}
     </div>
   );
-  
-  
 }
 
 

@@ -17,7 +17,7 @@ export default function Perfil() {
 
   return (
     <div className={styles.profileContainer}>
-      <h2 className={styles.titulo}>Hola, {user?.displayName || "Atleta"}!</h2>
+      
 
       <div className={styles.botones}>
         <BotonModulo 
