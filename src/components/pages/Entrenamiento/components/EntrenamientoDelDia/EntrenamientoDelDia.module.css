@@ -1,37 +1,28 @@
-.topRow {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 0.5rem;
-}
-
-.rutinaNombre {
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: #2c3e50;
-  margin-left: 10px;
-}
+/* ---------- General ---------- */
 
 .recordatorio {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-  border-radius: 20px;
-  padding: 2rem;
-  margin: 2rem 0;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
   position: relative;
-  text-align: center;
+  gap: 24px; /* espacio entre encabezado y contenido */
+  margin-top: 50px;
 }
 
 .descanso {
   background: linear-gradient(135deg, #f0fff4 0%, #e0f7e9 100%);
 }
 
+/* ---------- Encabezado ---------- */
+
 .encabezado {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 1.5rem;
 }
 
 .icono {
@@ -46,16 +37,42 @@
   text-transform: capitalize;
 }
 
+/* Botón de cambio de día (ícono arriba derecha) */
+.changeDayIcon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.changeDayIcon:hover {
+  color: #222;
+  transform: scale(1.1);
+}
+
+/* ---------- Contenido principal ---------- */
+
 .contenido {
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px; /* separación entre texto y botón */
+  padding-bottom: 0;
 }
 
 .ejercicio {
-  margin-bottom: 1rem;
+  margin: 0;
   font-size: 1.8rem;
   font-weight: 600;
   color: #1b5e20;
 }
+
+/* Botón "Comenzar Entrenamiento" */
 
 .startButton {
   background-color: #4caf50;
@@ -73,25 +90,14 @@
   background-color: #43a047;
 }
 
+/* ---------- Selector de días ---------- */
+
 .bottomSection {
-  margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.changeDayButton {
-  margin-top: 1rem;
-  background: none;
-  border: none;
-  color: #4caf50;
-  font-size: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.changeDayButton:hover {
-  text-decoration: underline;
+  margin-top: 1.5rem;
+  position: relative;
 }
 
 .diasLista {
@@ -116,6 +122,8 @@
 .diaItem:hover {
   background-color: #c8e6c9;
 }
+
+/* ---------- Loading estado ---------- */
 
 .loading {
   text-align: center;
@@ -124,49 +132,18 @@
   color: #555;
 }
 
+/* ---------- TopRow auxiliar (si algún día se usa en algún header) ---------- */
 
-
-.bottomSection {
-  margin-top: 1.5rem;
+.topRow {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
+  justify-content: flex-start;
+  margin-bottom: 0.5rem;
 }
 
-.changeDayButton {
-  margin-top: 1rem;
-  background: none;
-  border: none;
-  color: #4caf50;
-  font-size: 1rem;
-  cursor: pointer;
+.rutinaNombre {
+  font-size: 0.9rem;
   font-weight: bold;
-}
-
-.changeDayButton:hover {
-  text-decoration: underline;
-}
-
-.diasLista {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.diaItem {
-  background-color: #e8f5e9;
-  border: 1px solid #4caf50;
-  color: #2e7d32;
-  border-radius: 9999px;
-  padding: 6px 14px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.diaItem:hover {
-  background-color: #c8e6c9;
+  color: #2c3e50;
+  margin-left: 10px;
 }

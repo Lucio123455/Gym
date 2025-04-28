@@ -1,0 +1,44 @@
+.card {
+  display: flex;
+  align-items: center;
+  background: #ffffff; /* blanco puro para que contraste */
+  padding: 16px 20px;
+  border-radius: 16px; /* bordes bien redondeados */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); /* sombra elegante */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.card:hover {
+  background-color: #f8f9fa; /* apenas se aclara */
+  transform: translateY(-3px); /* levanta levemente */
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.12); /* sombra más intensa */
+}
+
+.icono {
+  font-size: 32px;
+  margin-right: 16px;
+  color: #333;
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+}
+
+.nombre {
+  font-size: 18px;
+  font-weight: bold;
+  color: #222;
+  margin: 0;
+}
+
+.descripcion {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+
+
+  

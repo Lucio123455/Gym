@@ -116,49 +116,48 @@ export default function EntrenamientoDelDia() {
 
   // Hasta acá todo igual...
 
-if (loading) {
-  return <Loading/>;
-}
+  if (loading) {
+    return <Loading />;
+  }
 
-return (
-  <div className={`${styles.recordatorio} ${nombreDiaRutina === 'Descanso' ? styles.descanso : ''} ${styles.fadeIn}`}>
-    <div className={styles.topRow}>
-      <div className={styles.rutinaNombre}>
-        {rutinaNombre}
-      </div>
-    </div>
+  return (
+    <div className={`${styles.recordatorio} ${nombreDiaRutina === 'Descanso' ? styles.descanso : ''} ${styles.fadeIn}`}>
 
-    <div className={styles.encabezado}>
-      <span className={styles.icono}>{emojiMostrar}</span>
-      <h1 className={styles.dia}>{diaActual.charAt(0).toUpperCase() + diaActual.slice(1)}</h1>
-    </div>
+      <div className={styles.encabezado}>
+        <span className={styles.icono}>{emojiMostrar}</span>
+        <h1 className={styles.dia}>{diaActual.charAt(0).toUpperCase() + diaActual.slice(1)}</h1>
 
-    <div className={styles.contenido}>
-      <p className={styles.ejercicio}>
-        {nombreDiaRutina === 'Descanso'
-          ? 'Hoy es tu día de descanso'
-          : `${diaActual === nombreHoy ? '¡Hoy toca:' : 'Harás:'} ${nombreDiaRutina}!`}
-      </p>
-
-      {nombreDiaRutina !== 'Descanso' && (
-        <button 
-          className={styles.startButton}
-          onClick={() => navigate('/entrenamiento-dia')}
+        {/* Botón cambio arriba a la derecha */}
+        <button
+          className={styles.changeDayIcon}
+          onClick={() => setModoCambio(!modoCambio)}
+          title="Cambiar Día"
         >
-          Comenzar Entrenamiento
+          🔄
         </button>
-      )}
-    </div>
+      </div>
 
-    <div className={styles.bottomSection}>
-      <button className={styles.changeDayButton} onClick={() => setModoCambio(!modoCambio)}>
-        Cambiar Día
-      </button>
+      <div className={styles.contenido}>
+        <p className={styles.ejercicio}>
+          {nombreDiaRutina === 'Descanso'
+            ? 'Hoy es tu día de descanso'
+            : `${diaActual === nombreHoy ? '¡Hoy toca:' : 'Harás:'} ${nombreDiaRutina}!`}
+        </p>
+
+        {nombreDiaRutina !== 'Descanso' && (
+          <button
+            className={styles.startButton}
+            onClick={() => navigate('/entrenamiento-dia')}
+          >
+            Comenzar Entrenamiento
+          </button>
+        )}
+      </div>
 
       {modoCambio && (
         <div className={styles.diasLista}>
           {diasDisponibles.map(dia => (
-            <button 
+            <button
               key={dia}
               className={styles.diaItem}
               onClick={() => cambiarDia(dia)}
@@ -169,9 +168,7 @@ return (
         </div>
       )}
     </div>
-  </div>
-);
-
+  );
 }
 
 
