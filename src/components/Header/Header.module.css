@@ -1,19 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap');
+
 .header {
-    background-color: #000;
-    color: white;
-    padding: 0.5rem 1rem; /* Reduce el padding vertical */
-    text-align: center;
-    width: 100%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada */
-    min-height: 5.5rem; /* Altura mínima garantizada */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 100%;
+  background-color: #2b2b2b;
+  color: #e5e5e5;
+  padding: 1rem 0;
+  border-bottom-left-radius: 3rem;
+  border-bottom-right-radius: 3rem;
+  border-bottom: 1px solid #3a3a3a;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: sticky; /* o fixed si querés que se mantenga arriba */
+  top: 0;
+  z-index: 10;
 }
 
 .title {
-    margin: 0;
-    font-size: clamp(2.5rem, 5vw, 3.5rem); /* Título responsive */
-    letter-spacing: 0.05em; /* Mejor legibilidad */
-    line-height: 1.2; /* Espaciado vertical óptimo */
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.04em;
 }
+
+
