@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, data } from 'react-router-dom';
 import {
   collection, query, orderBy, onSnapshot,
   doc, getDoc, addDoc, serverTimestamp, updateDoc, setDoc, getDocs
@@ -19,6 +19,7 @@ export default function ChatWindow() {
   const [currentUserDni, setCurrentUserDni] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [contactInfo, setContactInfo] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState('');
 
   useEffect(() => {
     const fetchUserAndContact = async () => {
@@ -27,7 +28,11 @@ export default function ChatWindow() {
 
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       const dni = userDoc.data()?.dni || '';
+      const role = userDoc.data()?.role || '';
+
       setCurrentUserDni(dni);
+      setCurrentUserRole(role); // 👈 nuevo
+
 
       const contactDni = chatId.split('_').find(d => d !== dni);
       const contactDoc = await getDoc(doc(db, 'users', contactDni));
@@ -184,6 +189,7 @@ export default function ChatWindow() {
       <Loading/>
     );
   }
+
   return (
 
     <div className={styles.chatContainer}>
@@ -204,7 +210,10 @@ export default function ChatWindow() {
         setNewMessage={setNewMessage}
         handleKeyPress={handleKeyPress}
         sendMessage={sendMessage}
-      />
+        currentUserRole={currentUserRole} // 👈 ahora sí es el del usuario actual
+        chatId={chatId}
+
+        />
     </div>
   );
 }

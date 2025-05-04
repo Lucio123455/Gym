@@ -14,8 +14,9 @@ export default function Entrenamiento() {
           icono="🏋️‍♂️"
           nombre="Rutinas"
           descripcion=""
-          ruta="/rutinas"
+          ruta="/entrenamiento/rutinas"
         />
+
         <BotonModulo
           icono="📈"
           nombre="Progreso"
@@ -35,7 +36,7 @@ export default function Entrenamiento() {
           ruta="/ejercicios"
         />
       </div>
-      <EntrenamientoSemanal/>
+      <EntrenamientoSemanal />
     </div>
   );
 }

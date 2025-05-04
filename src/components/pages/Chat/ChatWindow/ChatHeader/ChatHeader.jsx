@@ -30,7 +30,6 @@ const ChatHeader = ({ chatId, onBack }) => {
   
       if (!snapshot.empty) {
         const data = snapshot.docs[0].data();
-        console.log("Datos del contacto:", data);
         setNombreContacto(data.nombre?.trim() || dniContacto);
         setPhotoURL(data.photoURL || '');
         setStatus(data.status || null);

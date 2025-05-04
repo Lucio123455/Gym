@@ -27,6 +27,7 @@ export default function Navbar() {
         { path: "/chat", icon: chatIcon, iconActive: chatIconColor, label: "Chat" },
         { path: "/entrenamiento", icon: entrenamientoIcon, iconActive: entrenamientoIconColor, label: "Entrenamiento" },
         { path: "/perfil", icon: perfilIcon, iconActive: perfilIconColor, label: "Perfil" }
+        
       ];
 
   return (

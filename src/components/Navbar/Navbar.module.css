@@ -1,36 +1,35 @@
 .navbar {
-    position: fixed;
-    bottom: 0;
-    width: 92%;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: space-around;
-    background-color: #1e1e1e;
-    padding: 0.5rem 0.8rem;
-    margin-bottom: 0.7rem;
-    border-radius: 2rem;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    backdrop-filter: blur(6px); /* efecto glass suave */
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  
-  .navItem {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    padding: 0.3rem;
-  }
-  
-  .navIcon {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-    transition: all 0.2s ease;
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
-  }
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background-color: #1e1e1e;
+  padding: 0.35rem 0.6rem; /* MÁS BAJO */
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.navItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 0.25rem; /* más compacto */
+}
+
+.navIcon {
+  width: 24px;
+  height: 24px; /* íconos más chicos */
+  object-fit: contain;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}
+
   
   .navItem:hover .navIcon {
     opacity: 0.85;

@@ -10,6 +10,7 @@ import Perfil from './components/pages/Perfil/Perfil.jsx';
 import AuthGate from './components/AuthGate/AuthGate';
 import AdminPanel from './components/pages/AdminPanel/AdminPanel';
 import Loading from './components/Loading/Loading.jsx'; // 💡 Importa el nuevo loader
+import Rutinas from './components/pages/Entrenamiento/components/Modulos/Rutinas/Rutinas.jsx';
 
 function AppWrapper() {
   return (
@@ -45,6 +46,8 @@ function App() {
             ) : (
               <>
                 <Route path="/entrenamiento" element={<Entrenamiento />} />
+                <Route path="/entrenamiento/rutinas" element={<Rutinas/>} />
+
                 <Route path="/perfil" element={<Perfil />} />
               </>
             )}

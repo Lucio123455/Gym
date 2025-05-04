@@ -1,0 +1,46 @@
+.container {
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .titulo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .toggleButton {
+    background-color: #eaeaea;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #444;
+    transition: background-color 0.2s ease;
+  }
+  
+  .toggleButton:hover {
+    background-color: #d5d5d5;
+  }
+  
+  .estado {
+    font-size: 16px;
+    color: #666;
+    margin-top: 12px;
+  }
+  
+  .lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
