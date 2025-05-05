@@ -132,11 +132,60 @@ const Encabezado = ({ usuario, eliminarPublicacion, fecha }) => (
     </div>
 );
 
-const ImagenPublicacion = ({ src, alt }) => (
-    <div className={styles.contenidoImagen}>
-        <img src={src} className={styles.imagen} alt={alt} />
-    </div>
-);
+const ImagenPublicacion = ({ src, alt, videoUrl }) => {
+    const videoRef = useRef(null);
+
+    const esImagen = (url) =>
+        /(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.webp)(\?.*)?$/i.test(url);
+
+    const esVideo = (url) =>
+        /(\.mp4|\.webm|\.ogg)(\?.*)?$/i.test(url);
+
+    const esYouTube = (url) =>
+        url?.includes('youtube') || url?.includes('youtu.be');
+
+    const togglePlay = () => {
+        const video = videoRef.current;
+        if (video?.paused) video.play();
+        else video.pause();
+    };
+
+    return (
+        <div className={styles.contenidoImagen}>
+            {src && esImagen(src) && (
+                <img src={src} className={styles.imagen} alt={alt} />
+            )}
+
+            {videoUrl && esYouTube(videoUrl) && (
+                <iframe
+                    width="100%"
+                    height="250"
+                    src={videoUrl.replace("watch?v=", "embed/")}
+                    title="Video"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                ></iframe>
+            )}
+
+            {videoUrl && esVideo(videoUrl) && (
+                <video
+                    ref={videoRef}
+                    className={styles.imagen}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    onClick={togglePlay}
+                >
+                    <source src={videoUrl} />
+                    Tu navegador no soporta el video.
+                </video>
+            )}
+        </div>
+    );
+};
+
 
 const Descripcion = ({ texto }) => (
     <div className={styles.descripcion}>
@@ -273,55 +322,55 @@ const AgregarComentario = ({
 
 // ---------------- COMPONENTE PRINCIPAL ----------------
 
-function Publicacion({ publicacion , usuario} ) {
+function Publicacion({ publicacion, usuario }) {
     const [nuevoComentario, setNuevoComentario] = useState('');
     const [mostrarComentarios, setMostrarComentarios] = useState(false);
     const [animarComentarios, setAnimarComentarios] = useState(false);
     const [loadingComentario, setLoadingComentario] = useState(false);
     const [comentariosLocal, setComentariosLocal] = useState(publicacion.comentarios || []);
 
-    
+
 
     const eliminarComentario = async (index) => {
         const confirmado = await confirmarEliminacion('¿Eliminar este comentario?', 'Esta acción no se puede deshacer.');
         if (!confirmado) return;
-      
-        try {
-          const publicacionRef = doc(db, 'Publicaciones', publicacion.id);
-          const publicacionSnap = await getDoc(publicacionRef);
-          const data = publicacionSnap.data();
-          const comentariosActuales = Array.isArray(data?.comentarios) ? data.comentarios : [];
-      
-          const comentariosActualizados = comentariosActuales.filter((_, i) => i !== index);
-      
-          await setDoc(publicacionRef, { comentarios: comentariosActualizados }, { merge: true });
-          await mostrarExito('Comentario eliminado');
-          window.location.reload();
-        } catch (error) {
-          console.error("Error al eliminar comentario:", error);
-          mostrarError('Hubo un problema al eliminar el comentario.');
-        }
-      };
-      
-      
-      
 
-    
+        try {
+            const publicacionRef = doc(db, 'Publicaciones', publicacion.id);
+            const publicacionSnap = await getDoc(publicacionRef);
+            const data = publicacionSnap.data();
+            const comentariosActuales = Array.isArray(data?.comentarios) ? data.comentarios : [];
+
+            const comentariosActualizados = comentariosActuales.filter((_, i) => i !== index);
+
+            await setDoc(publicacionRef, { comentarios: comentariosActualizados }, { merge: true });
+            await mostrarExito('Comentario eliminado');
+            window.location.reload();
+        } catch (error) {
+            console.error("Error al eliminar comentario:", error);
+            mostrarError('Hubo un problema al eliminar el comentario.');
+        }
+    };
+
+
+
+
+
 
     const eliminarPublicacion = async () => {
         const confirmado = await confirmarEliminacion('¿Eliminar publicación?', 'Esta acción eliminará la publicación por completo.');
         if (!confirmado) return;
-      
+
         try {
-          await deleteDoc(doc(db, 'Publicaciones', publicacion.id));
-          await mostrarExito('Publicación eliminada');
-          window.location.reload();
+            await deleteDoc(doc(db, 'Publicaciones', publicacion.id));
+            await mostrarExito('Publicación eliminada');
+            window.location.reload();
         } catch (error) {
-          console.error("Error al eliminar publicación:", error);
-          mostrarError('Ocurrió un error al eliminar la publicación.');
+            console.error("Error al eliminar publicación:", error);
+            mostrarError('Ocurrió un error al eliminar la publicación.');
         }
-      };
-      
+    };
+
 
 
     const currentUser = auth.currentUser;
@@ -389,6 +438,7 @@ function Publicacion({ publicacion , usuario} ) {
             <Encabezado usuario={usuario} eliminarPublicacion={eliminarPublicacion} fecha={publicacion.fecha} />
             <ImagenPublicacion
                 src={publicacion.imagen}
+                videoUrl={publicacion.video}
                 alt={`Publicación de ${publicacion.autor}`}
             />
             <Descripcion texto={publicacion.descripcion} />

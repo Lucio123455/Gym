@@ -25,10 +25,10 @@ function Home() {
     return (
         
         <div>
-            <Concurrencia />
+    {/* <Concurrencia />
             {usuario?.role !== 'admin' && (
                 <Recordatorio />
-            )}
+            )}*/ }
             <Publicaciones usuario={usuario}/>
         </div>
     );
