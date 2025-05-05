@@ -11,6 +11,7 @@ import AuthGate from './components/AuthGate/AuthGate';
 import AdminPanel from './components/pages/AdminPanel/AdminPanel';
 import Loading from './components/Loading/Loading.jsx'; // 💡 Importa el nuevo loader
 import Rutinas from './components/pages/Entrenamiento/components/Modulos/Rutinas/Rutinas.jsx';
+import Datos from './components/pages/Perfil/modulos/Datos/Datos.jsx';
 
 function AppWrapper() {
   return (
@@ -40,7 +41,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:chatId" element={<ChatWindow />} />
-
+            
             {user?.role === 'admin' ? (
               <Route path="/admin" element={<AdminPanel />} />
             ) : (
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/entrenamiento/rutinas" element={<Rutinas/>} />
 
                 <Route path="/perfil" element={<Perfil />} />
+                <Route path="/perfil/datos" element = {<Datos/>} />
               </>
             )}
             

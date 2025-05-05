@@ -222,7 +222,17 @@ const Comentarios = ({
                         {comentarios.map((comentario, index) => (
                             <div key={index} className={styles.comentario}>
                                 <div className={styles.avatarComentario}>
-                                    {comentario.usuarioNombre?.[0] || 'U'}
+                                    {comentario.usuarioFotoURL ? (
+                                        <img
+                                            src={comentario.usuarioFotoURL}
+                                            alt="Avatar"
+                                            className={styles.avatarComentarioImg}
+                                        />
+                                    ) : (
+                                        <span className={styles.inicialComentario}>
+                                            {comentario.usuarioNombre?.[0] || 'U'}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className={styles.cuerpoComentario}>
                                     <div className={styles.comentarioHeader}>
