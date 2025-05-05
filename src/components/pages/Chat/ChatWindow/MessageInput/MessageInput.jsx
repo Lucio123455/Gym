@@ -1,8 +1,9 @@
 import { IoIosSend } from 'react-icons/io';
 import styles from './MessageInput.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { collection, getDocs, setDoc, doc, where, query, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../../../../../firebase/config';
+import { showConfirm, showError, showSuccess } from '../../../../AlertService';
 
 const MessageInput = ({
   newMessage,
@@ -10,11 +11,26 @@ const MessageInput = ({
   handleKeyPress,
   sendMessage,
   currentUserRole,
-  chatId
+  chatId,
 }) => {
   const [showRutinas, setShowRutinas] = useState(false);
   const [rutinas, setRutinas] = useState([]);
   const [selectedRutina, setSelectedRutina] = useState(null);
+  const [loadingAsignacion, setLoadingAsignacion] = useState(false);
+
+  const modalRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showRutinas && modalRef.current && !modalRef.current.contains(e.target)) {
+        setShowRutinas(false);
+        setSelectedRutina(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showRutinas]);
 
   const fetchRutinas = async () => {
     const snapshot = await getDocs(collection(db, 'rutinas'));
@@ -25,47 +41,92 @@ const MessageInput = ({
   const toggleRutinas = () => {
     if (!showRutinas) fetchRutinas();
     setShowRutinas(prev => !prev);
-    setSelectedRutina(null); // limpiar selección si se vuelve a abrir
+    setSelectedRutina(null);
   };
 
   const handleSelectRutina = (rutina) => {
     setSelectedRutina(rutina);
   };
 
-
   const handleAsignarRutina = async () => {
     if (!selectedRutina) return;
+    if (setLoadingAsignacion) setLoadingAsignacion(true);
 
-    const [alumnoDni] = chatId.split('_'); // el primero es siempre el alumno
+    const [alumnoDni] = chatId.split('_');
 
     try {
-      // Buscar el usuario cuyo dni coincida con el del alumno
+      // 1. Buscar UID del alumno
       const q = query(collection(db, 'users'), where('dni', '==', alumnoDni));
       const querySnapshot = await getDocs(q);
-
       if (querySnapshot.empty) {
-        alert("❌ No se encontró el alumno con ese DNI.");
+        showError("❌ No se encontró el alumno con ese DNI.");
         return;
       }
 
-      const userDoc = querySnapshot.docs[0]; // único resultado esperado
+      const userDoc = querySnapshot.docs[0];
       const userUid = userDoc.id;
 
-      // Guardar la rutina en users/{uid}/rutinas
-      await setDoc(
-        doc(db, `users/${userUid}/rutinas`, selectedRutina.id),
-        selectedRutina
-      );
+      // 2. Guardar rutina raíz
+      const rutinaRef = doc(db, `users/${userUid}/rutinas/${selectedRutina.id}`);
+      await setDoc(rutinaRef, selectedRutina);
 
-      alert("✅ Rutina asignada con éxito");
+      // 3. Obtener días
+      const diasSnap = await getDocs(collection(db, `rutinas/${selectedRutina.id}/Dias`));
+
+      const diaPromises = diasSnap.docs.map(async (diaDoc) => {
+        const diaData = diaDoc.data();
+        const diaPath = `users/${userUid}/rutinas/${selectedRutina.id}/Dias/${diaDoc.id}`;
+        const diaRef = doc(db, diaPath);
+        const setDia = setDoc(diaRef, diaData);
+
+        // 4. Obtener ejercicios de este día
+        const ejerciciosSnap = await getDocs(collection(db, `rutinas/${selectedRutina.id}/Dias/${diaDoc.id}/Ejercicios`));
+
+        const ejercicioPromises = ejerciciosSnap.docs.map(async (ejDoc) => {
+          const ejData = ejDoc.data();
+          const ejPath = `${diaPath}/Ejercicios/${ejDoc.id}`;
+          const ejRef = doc(db, ejPath);
+          const setEj = setDoc(ejRef, ejData);
+
+          // 5. Obtener series
+          const seriesSnap = await getDocs(collection(db, `rutinas/${selectedRutina.id}/Dias/${diaDoc.id}/Ejercicios/${ejDoc.id}/Series`));
+
+          const seriesPromises = seriesSnap.docs.map((serieDoc) => {
+            const serieData = serieDoc.data();
+            const serieRef = doc(db, `${ejPath}/Series/${serieDoc.id}`);
+            return setDoc(serieRef, serieData);
+          });
+
+          // Esperar a que se creen todas las series
+          await Promise.all(seriesPromises);
+          return setEj;
+        });
+
+        // Esperar a que se creen todos los ejercicios + el día
+        await Promise.all(ejercicioPromises);
+        return setDia;
+      });
+
+      await Promise.all(diaPromises);
+
+      // 6. Enviar mensaje especial al chat
+      await addDoc(collection(db, 'chats', chatId, 'messages'), {
+        text: '🏋️ El entrenador te asignó una nueva rutina.',
+        link: '/entrenamiento/rutinas',
+        timestamp: serverTimestamp(),
+        tipo: 'asignacion',
+      });
+
+      showSuccess("✅ Rutina asignada con éxito");
       setShowRutinas(false);
       setSelectedRutina(null);
     } catch (error) {
       console.error("Error al asignar rutina:", error);
-      alert("❌ Error al asignar rutina");
+      showError("❌ Error al asignar rutina");
+    } finally {
+      if (setLoadingAsignacion) setLoadingAsignacion(false);
     }
   };
-
 
 
   return (
@@ -80,6 +141,12 @@ const MessageInput = ({
           className={styles.input}
           aria-label="Escribe tu mensaje"
         />
+
+        {loadingAsignacion && (
+          <div className={styles.sutilLoading}>
+            Asignando rutina...
+          </div>
+        )}
 
         <div className={styles.buttonGroup}>
           {currentUserRole === 'entrenador' && (
@@ -102,9 +169,8 @@ const MessageInput = ({
         </div>
       </div>
 
-      {/* Modal para seleccionar rutina */}
       {showRutinas && (
-        <div className={styles.modal}>
+        <div className={styles.modal} ref={modalRef}>
           <h4>Seleccioná una rutina</h4>
           <ul className={styles.rutinaList}>
             {rutinas.map((rutina) => (
@@ -132,6 +198,7 @@ const MessageInput = ({
 };
 
 export default MessageInput;
+
 
 
 

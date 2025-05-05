@@ -73,3 +73,19 @@
     font-size: 14px;
   }
 }
+
+.asignacion {
+  background-color: #e0f7fa !important;
+  color: #006064 !important;
+  border-left: 4px solid #26c6da;
+  font-weight: 500;
+}
+
+.linkEspecial {
+  display: inline-block;
+  margin-top: 4px;
+  color: #0077cc;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
