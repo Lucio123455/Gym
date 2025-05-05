@@ -463,7 +463,7 @@ function Publicacion({ publicacion, usuario }) {
     );
 }
 
-export default Publicacion;
+export default Publicacion;;
 
 
 
