@@ -4,7 +4,7 @@ import Header from './components/Header/Header.jsx';
 import Navbar from './components/Navbar/Navbar';
 import Home from './components/pages/Home/Home.jsx';
 import ChatList from './components/pages/Chat/ChatList.jsx';
-import ChatWindow from './components/pages/Chat/ChatWindow/ChatWindow.jsx'; 
+import ChatWindow from './components/pages/Chat/ChatWindow/ChatWindow.jsx';
 import Entrenamiento from './components/pages/Entrenamiento/Entrenamiento.jsx';
 import Perfil from './components/pages/Perfil/Perfil.jsx';
 import AuthGate from './components/AuthGate/AuthGate';
@@ -12,11 +12,15 @@ import AdminPanel from './components/pages/AdminPanel/AdminPanel';
 import Loading from './components/Loading/Loading.jsx'; // 💡 Importa el nuevo loader
 import Rutinas from './components/pages/Entrenamiento/components/Modulos/Rutinas/Rutinas.jsx';
 import Datos from './components/pages/Perfil/modulos/Datos/Datos.jsx';
+import { UsuarioProvider } from './context/UsuarioContext.jsx';
+import { usePublicaciones } from './hooks/usePublicaiones.js';
 
 function AppWrapper() {
   return (
     <Router>
-      <App />
+      <UsuarioProvider>
+        <App />
+      </UsuarioProvider>
     </Router>
   );
 }
@@ -24,6 +28,9 @@ function AppWrapper() {
 function App() {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const { publicaciones } = usePublicaciones();
+
+  console.log(user)
 
   const isChatWindow = location.pathname.startsWith('/chat/') && location.pathname !== '/chat';
 
@@ -36,24 +43,24 @@ function App() {
       ) : (
         <>
           {!isChatWindow && <Header />}
-          
+
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home publicaciones={publicaciones} />} />
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:chatId" element={<ChatWindow />} />
-            
+
             {user?.role === 'admin' ? (
               <Route path="/admin" element={<AdminPanel />} />
             ) : (
               <>
                 <Route path="/entrenamiento" element={<Entrenamiento />} />
-                <Route path="/entrenamiento/rutinas" element={<Rutinas/>} />
+                <Route path="/entrenamiento/rutinas" element={<Rutinas />} />
 
                 <Route path="/perfil" element={<Perfil />} />
-                <Route path="/perfil/datos" element = {<Datos/>} />
+                <Route path="/perfil/datos" element={<Datos />} />
               </>
             )}
-            
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
 

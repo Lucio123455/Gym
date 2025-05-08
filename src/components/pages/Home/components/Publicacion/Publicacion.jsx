@@ -384,7 +384,6 @@ function Publicacion({ publicacion, usuario }) {
 
 
     const currentUser = auth.currentUser;
-    console.log(currentUser)
     const comentariosRef = useRef(null);
 
     useEffect(() => {
