@@ -1,0 +1,11 @@
+.contenidoImagen {
+    width: 100%;
+    aspect-ratio: 1/1;
+  }
+  
+  .imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  

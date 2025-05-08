@@ -10,12 +10,13 @@ import homeIconColor from '../../assets/Home-Link-color.png';
 import entrenamientoIconColor from '../../assets/Entrenamiento-Link-color.png';   
 import chatIconColor from '../../assets/Chat-Link-color.png';
 import perfilIconColor from '../../assets/Perfil-Link-color.png';
+import React from 'react';
+// (todo tu código actual...)
 
-export default function Navbar() {
+function Navbar() {
   const location = useLocation();
   const { user } = useAuth();
 
-  // Definimos los items según el rol
   const navItems = user?.role === 'admin' 
     ? [
         { path: "/", icon: homeIcon, iconActive: homeIconColor, label: "Home" },
@@ -27,7 +28,6 @@ export default function Navbar() {
         { path: "/chat", icon: chatIcon, iconActive: chatIconColor, label: "Chat" },
         { path: "/entrenamiento", icon: entrenamientoIcon, iconActive: entrenamientoIconColor, label: "Entrenamiento" },
         { path: "/perfil", icon: perfilIcon, iconActive: perfilIconColor, label: "Perfil" }
-        
       ];
 
   return (
@@ -55,3 +55,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+export default React.memo(Navbar);

@@ -28,9 +28,6 @@ function AppWrapper() {
 function App() {
   const { user, loading } = useAuth();
   const location = useLocation();
-  const { publicaciones } = usePublicaciones();
-
-  console.log(user)
 
   const isChatWindow = location.pathname.startsWith('/chat/') && location.pathname !== '/chat';
 
@@ -45,7 +42,7 @@ function App() {
           {!isChatWindow && <Header />}
 
           <Routes>
-            <Route path="/" element={<Home publicaciones={publicaciones} />} />
+            <Route path="/" element={<Home />} />
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:chatId" element={<ChatWindow />} />
 

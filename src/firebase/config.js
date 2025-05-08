@@ -1,11 +1,23 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth'; // Nuevo
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  deleteDoc,
+  addDoc,
+  getDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  deleteField
+} from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase config desde .env
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -16,10 +28,26 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app); // Nuevo
+const auth = getAuth(app);
 const storage = getStorage(app);
 
-export { db, auth, storage }; // Actualizado
+// Exportar instancia + helpers
+export {
+  db,
+  auth,
+  storage,
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  deleteDoc,
+  addDoc,
+  getDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  deleteField
+};

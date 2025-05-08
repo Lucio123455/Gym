@@ -1,0 +1,35 @@
+.agregarComentario {
+    display: flex;
+    padding: 16px;
+    border-top: 1px solid #efefef;
+  }
+  
+  .agregarComentario input {
+    flex: 1;
+    border: none;
+    outline: none;
+  }
+  
+  .botonPublicar {
+    color: #0095f6;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .publicando {
+    color: #8e8e8e;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    align-self: center;
+    font-style: italic;
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+  }
+  

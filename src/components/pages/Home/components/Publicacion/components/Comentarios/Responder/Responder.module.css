@@ -1,0 +1,48 @@
+.botonResponder {
+    background: none;
+    border: none;
+    color: #8e8e8e;
+    font-size: 0.75rem;
+    padding: 0;
+    cursor: pointer;
+  }
+  
+  .responderContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  
+  .responderContainer input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.85rem;
+    padding: 2px 4px;
+  }
+  
+  .responderContainer button {
+    align-self: flex-start;
+    font-size: 0.85rem;
+    background: none;
+    border: none;
+    color: #8e8e8e;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .responderAnimado {
+    overflow: hidden;
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-5px);
+    transition: opacity 0.3s ease, max-height 0.3s ease, transform 0.3s ease;
+  }
+  
+  .responderAnimado.activo {
+    opacity: 1;
+    max-height: 80px;
+    transform: translateY(0);
+  }
+  
