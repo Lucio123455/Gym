@@ -9,12 +9,13 @@ import { db } from '../../../../../firebase/config';
 import styles from './Publicacion.module.css';
 import {
   agregarComentarioEnPublicacion,
-  eliminarPublicacionConConfirmacion
+  eliminarPublicacion
 } from '../../../../../services/publicaciones';
+import { confirmDeletionDialog, showToastSuccess } from '../../../../../utils/AlertService.js'
 
 import Encabezado from './components/Encabezado/Encabezado.jsx';
 import ImagenPublicacion from './components/ImagenPublicacion/ImagenPublicacion.jsx';
-import Descripcion from './Descripcion/Descripcion.jsx';
+import Descripcion from './components/Descripcion/Descripcion.jsx';
 import Comentarios from './components/Comentarios/Comentarios.jsx';
 import AgregarComentario from './components/AgregarComentario/AgregarComentario.jsx';
 
@@ -56,16 +57,29 @@ function Publicacion({ publicacion, usuario }) {
       setNuevoComentario
     });
 
-  const eliminarPublicacion = async () => {
-    const ok = await eliminarPublicacionConConfirmacion(publicacion.id);
-    if (ok) {
-      // Acá podrías emitir un evento al padre o actualizar lista
-    }
-  };
+    const eliminarPublicacionHandler = async () => {
+        const confirmado = await confirmDeletionDialog(
+          '¿Estás seguro?',
+          'Esta acción eliminará la publicación para siempre.'
+        );
+      
+        if (!confirmado) return;
+      
+        const ok = await eliminarPublicacion(publicacion.id);
+      
+        if (ok) {
+          showToastSuccess('Publicación eliminada');
+          setTimeout(() => {
+            window.location.reload();
+          }, 800); // espera un poco para que se vea el toast
+        }
+      };
+      
+      
 
   return (
     <div className={styles.publicacionContainer}>
-      <Encabezado usuario={usuario} eliminarPublicacion={eliminarPublicacion} fecha={publicacion.fecha} />
+      <Encabezado usuario={usuario} eliminarPublicacion={eliminarPublicacionHandler} fecha={publicacion.fecha} />
       <ImagenPublicacion src={publicacion.imagen} videoUrl={publicacion.video} alt={`Publicación de ${publicacion.autor}`} />
       <Descripcion texto={publicacion.descripcion} />
       <Comentarios

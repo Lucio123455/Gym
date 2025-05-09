@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import { getDocs, updateDoc, doc, collection, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../../../../../../../firebase/config';
 import Loading from '../../../../../../Loading/Loading';
-import { showSuccess, showError, showConfirm } from '../../../../../../AlertService.js';
+import { showSuccess, showError, showConfirm } from '../../../../../../../utils/AlertService.js';
 
 export default function CartaRutina({ rutina, esPublica = false }) {
     const [loadingPDF, setLoadingPDF] = useState(false);

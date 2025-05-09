@@ -44,23 +44,13 @@ export const agregarComentarioEnPublicacion = async ({
   }
 };
 
-/**
- * Elimina una publicación completa después de confirmación.
- */
-export const eliminarPublicacionConConfirmacion = async (publicacionId) => {
-  const confirmado = await confirmarEliminacion(
-    '¿Eliminar publicación?',
-    'Esta acción eliminará la publicación por completo.'
-  );
-  if (!confirmado) return false;
-
+export const eliminarPublicacion = async (publicacionId) => {
   try {
     await deleteDoc(doc(db, 'Publicaciones', publicacionId));
-    await mostrarExito('Publicación eliminada');
+    console.log(`✅ Publicación eliminada: ID = ${publicacionId}`);
     return true;
   } catch (error) {
-    console.error("Error al eliminar publicación:", error);
-    mostrarError('Ocurrió un error al eliminar la publicación.');
+    console.error("❌ Error al eliminar publicación:", error);
     return false;
   }
 };
