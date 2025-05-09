@@ -11,7 +11,7 @@ import {
   agregarComentarioEnPublicacion,
   eliminarPublicacion
 } from '../../../../../services/publicaciones';
-import { confirmDeletionDialog, showToastSuccess } from '../../../../../utils/AlertService.js'
+import { confirmDeletionDialog, showToastSuccess, showToastError } from '../../../../../utils/AlertService.js'
 
 import Encabezado from './components/Encabezado/Encabezado.jsx';
 import ImagenPublicacion from './components/ImagenPublicacion/ImagenPublicacion.jsx';
@@ -57,25 +57,27 @@ function Publicacion({ publicacion, usuario }) {
       setNuevoComentario
     });
 
-    const eliminarPublicacionHandler = async () => {
-        const confirmado = await confirmDeletionDialog(
-          '¿Estás seguro?',
-          'Esta acción eliminará la publicación para siempre.'
-        );
-      
-        if (!confirmado) return;
-      
-        const ok = await eliminarPublicacion(publicacion.id);
-      
-        if (ok) {
-          showToastSuccess('Publicación eliminada');
-          setTimeout(() => {
-            window.location.reload();
-          }, 800); // espera un poco para que se vea el toast
-        }
-      };
-      
-      
+  const eliminarPublicacionHandler = async () => {
+    const confirmado = await confirmDeletionDialog(
+      '¿Estás seguro?',
+      'Esta acción eliminará la publicación para siempre.'
+    );
+
+    if (!confirmado) return;
+
+    const ok = await eliminarPublicacion(publicacion.id);
+
+    if (ok) {
+      showToastSuccess('Publicación eliminada');
+      setTimeout(() => {
+        window.location.reload();
+      }, 800);
+    } else {
+      showToastError('No se pudo eliminar la publicación');
+    }
+  };
+
+
 
   return (
     <div className={styles.publicacionContainer}>

@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import styles from './ImagenPublicacion.module.css';
 
 export default function ImagenPublicacion({ src, alt, videoUrl }) {
   const videoRef = useRef(null);
+  const [muted, setMuted] = useState(true);
+  const [mostrarIcono, setMostrarIcono] = useState(false);
 
   const esImagen = (url) =>
     /(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.webp)(\?.*)?$/i.test(url);
@@ -13,11 +15,23 @@ export default function ImagenPublicacion({ src, alt, videoUrl }) {
   const esYouTube = (url) =>
     url?.includes('youtube') || url?.includes('youtu.be');
 
-  const togglePlay = () => {
+  const toggleMute = () => {
     const video = videoRef.current;
-    if (video?.paused) video.play();
-    else video.pause();
+    if (video) {
+      const nuevoMuted = !video.muted;
+      video.muted = nuevoMuted;
+      setMuted(nuevoMuted);
+      setMostrarIcono(true);
+      setTimeout(() => setMostrarIcono(false), 1000);
+    }
   };
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.play().catch(() => {});
+    }
+  }, []);
 
   return (
     <div className={styles.contenidoImagen}>
@@ -38,19 +52,28 @@ export default function ImagenPublicacion({ src, alt, videoUrl }) {
       )}
 
       {videoUrl && esVideo(videoUrl) && (
-        <video
-          ref={videoRef}
-          className={styles.imagen}
-          autoPlay
-          muted
-          loop
-          playsInline
-          onClick={togglePlay}
-        >
-          <source src={videoUrl} />
-          Tu navegador no soporta el video.
-        </video>
+        <div className={styles.videoWrapper}>
+          <video
+            ref={videoRef}
+            className={styles.imagen}
+            autoPlay
+            muted
+            loop
+            playsInline
+            onClick={toggleMute}
+          >
+            <source src={videoUrl} />
+            Tu navegador no soporta el video.
+          </video>
+          {mostrarIcono && (
+            <div className={`${styles.iconoVolumen} ${muted ? styles.mute : styles.sound}`}>
+              {muted ? '🔇' : '🔊'}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
 }
+
+

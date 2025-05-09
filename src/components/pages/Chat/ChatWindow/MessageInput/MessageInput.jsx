@@ -3,7 +3,7 @@ import styles from './MessageInput.module.css';
 import { useState, useRef, useEffect } from 'react';
 import { collection, getDocs, setDoc, doc, where, query, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../../../../../firebase/config';
-import { showConfirm, showError, showSuccess } from '../../../../AlertService';
+import {  showToastError, showToastSuccess } from '../../../../../utils/AlertService.js';
 
 const MessageInput = ({
   newMessage,
@@ -59,7 +59,7 @@ const MessageInput = ({
       const q = query(collection(db, 'users'), where('dni', '==', alumnoDni));
       const querySnapshot = await getDocs(q);
       if (querySnapshot.empty) {
-        showError("❌ No se encontró el alumno con ese DNI.");
+        showToastError("❌ No se encontró el alumno con ese DNI.");
         return;
       }
 
@@ -117,12 +117,12 @@ const MessageInput = ({
         tipo: 'asignacion',
       });
 
-      showSuccess("✅ Rutina asignada con éxito");
+      showToastSuccess("✅ Rutina asignada con éxito");
       setShowRutinas(false);
       setSelectedRutina(null);
     } catch (error) {
       console.error("Error al asignar rutina:", error);
-      showError("❌ Error al asignar rutina");
+      showToastError("❌ Error al asignar rutina");
     } finally {
       if (setLoadingAsignacion) setLoadingAsignacion(false);
     }

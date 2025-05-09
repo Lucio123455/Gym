@@ -6,20 +6,28 @@ export default function Encabezado({ usuario, eliminarPublicacion, fecha }) {
     <div className={styles.encabezado}>
       <div className={styles.autorInfo}>
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzPs0ng1OihF-_SsKH3o2j2ThKJa21zWYlmg&s"
-          alt="Avatar del autor"
+          src={usuario.fotoURL}
+          alt={`Avatar de ${usuario.nombre}`}
           className={styles.avatar}
+          title={usuario.nombre} // tooltip opcional
         />
-        <span className={styles.nombreAutor}>Will Power Gym</span>
+        <span className={styles.nombreAutor}>{usuario.nombre}</span>
       </div>
-      <span className={styles.fecha}>
-        {new Date(fecha).toLocaleDateString()}
-      </span>
-      {usuario?.role === 'admin' && (
-        <button className={styles.botonEliminar} onClick={eliminarPublicacion}>
-          Eliminar
-        </button>
-      )}
+
+      <div className={styles.fechaYBoton}>
+        <span className={styles.fecha}>
+          {new Date(fecha).toLocaleDateString()}
+        </span>
+
+        {usuario?.role === 'admin' && (
+          <button className={styles.botonEliminar} onClick={eliminarPublicacion}>
+            Eliminar
+          </button>
+        )}
+      </div>
     </div>
   );
 }
+
+
+

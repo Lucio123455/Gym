@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import { getDocs, updateDoc, doc, collection, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../../../../../../../firebase/config';
 import Loading from '../../../../../../Loading/Loading';
-import { showSuccess, showError, showConfirm } from '../../../../../../../utils/AlertService.js';
+import { showModalSuccess, showToastError, showConfirmationDialog } from '../../../../../../../utils/AlertService.js';
 
 export default function CartaRutina({ rutina, esPublica = false }) {
     const [loadingPDF, setLoadingPDF] = useState(false);
@@ -12,7 +12,7 @@ export default function CartaRutina({ rutina, esPublica = false }) {
 
     const handleEliminarRutina = async () => {
         try {
-            const confirm = await showConfirm('¿Estás seguro que querés eliminar esta rutina?');
+            const confirm = await showConfirmationDialog('¿Estás seguro que querés eliminar esta rutina?');
             if (!confirm) return;
 
             setEliminada(true); // activa la animación visual
@@ -22,11 +22,11 @@ export default function CartaRutina({ rutina, esPublica = false }) {
                 if (!user) return;
 
                 await deleteDoc(doc(db, `users/${user.uid}/rutinas/${rutina.id}`));
-                showSuccess('🗑️ Rutina eliminada correctamente');
+                showModalSuccess('🗑️ Rutina eliminada correctamente');
             }, 400); // tiempo igual al de la animación
         } catch (error) {
             console.error('Error al eliminar rutina:', error);
-            showError('❌ No se pudo eliminar la rutina');
+            showToastError('❌ No se pudo eliminar la rutina');
         }
     };
 
@@ -52,10 +52,10 @@ export default function CartaRutina({ rutina, esPublica = false }) {
                 principal: true
             });
 
-            showSuccess("Rutina activada como principal")
+            showModalSuccess("Rutina activada como principal")
         } catch (error) {
             console.error("Error al activar rutina:", error);
-            alert("❌ Hubo un error al activar la rutina");
+            showToastError("❌ Hubo un error al activar la rutina");
         }
     };
 
