@@ -1,17 +1,17 @@
 import React from 'react';
 import styles from './Encabezado.module.css';
 
-export default function Encabezado({ usuario, eliminarPublicacion, fecha }) {
+export default function Encabezado({ usuario,publicacion, eliminarPublicacion, fecha }) {
   return (
     <div className={styles.encabezado}>
       <div className={styles.autorInfo}>
         <img
-          src={usuario.fotoURL}
-          alt={`Avatar de ${usuario.nombre}`}
+          src={publicacion.fotoURL}
+          alt={`Avatar de ${publicacion.autor}`}
           className={styles.avatar}
-          title={usuario.nombre} // tooltip opcional
+          title={publicacion.autor} // tooltip opcional
         />
-        <span className={styles.nombreAutor}>{usuario.nombre}</span>
+        <span className={styles.nombreAutor}>{publicacion.autor}</span>
       </div>
 
       <div className={styles.fechaYBoton}>

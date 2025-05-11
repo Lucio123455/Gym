@@ -19,7 +19,7 @@ import Descripcion from './components/Descripcion/Descripcion.jsx';
 import Comentarios from './components/Comentarios/Comentarios.jsx';
 import AgregarComentario from './components/AgregarComentario/AgregarComentario.jsx';
 
-function Publicacion({ publicacion, usuario }) {
+function Publicacion({ publicacion, usuario, mutedGlobal,setMutedGlobal }) {
   const [nuevoComentario, setNuevoComentario] = useState('');
   const [mostrarComentarios, setMostrarComentarios] = useState(false);
   const [animarComentarios, setAnimarComentarios] = useState(false);
@@ -81,8 +81,8 @@ function Publicacion({ publicacion, usuario }) {
 
   return (
     <div className={styles.publicacionContainer}>
-      <Encabezado usuario={usuario} eliminarPublicacion={eliminarPublicacionHandler} fecha={publicacion.fecha} />
-      <ImagenPublicacion src={publicacion.imagen} videoUrl={publicacion.video} alt={`Publicación de ${publicacion.autor}`} />
+      <Encabezado usuario={usuario} publicacion={publicacion} eliminarPublicacion={eliminarPublicacionHandler} fecha={publicacion.fecha} />
+      <ImagenPublicacion src={publicacion.imagen} videoUrl={publicacion.video} alt={`Publicación de ${publicacion.autor}`} mutedGlobal={mutedGlobal} setMutedGlobal={setMutedGlobal} />
       <Descripcion texto={publicacion.descripcion} />
       <Comentarios
         comentarios={comentariosLocal}

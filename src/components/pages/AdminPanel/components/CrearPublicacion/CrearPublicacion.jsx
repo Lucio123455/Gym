@@ -40,7 +40,8 @@ export default function CrearPublicacion() {
                 imagen: isImage ? mediaUrl : '',
                 video: isVideo ? mediaUrl : '',
                 fecha: new Date().toISOString(),
-                autor: user.email,
+                autor: user.nombre,
+                fotoURL: user.fotoURL,
                 likes: 0,
                 comentarios: []
             };
