@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../../../../../../../../firebase/config';
-import styles from './Responder.module.css';
 
-export default function Responder({ comentarioIndex, publicacionId, setComentariosLocal }) {
+import styles from './Responder.module.css';
+import { agregarRespuesta } from '../../../../../../../../services/publicaciones';
+
+export default function Responder({ comentarioId, publicacionId, setRespuestasPorComentario, usuario }) {
   const [respuesta, setRespuesta] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [mostrarInput, setMostrarInput] = useState(false);
@@ -30,35 +30,29 @@ export default function Responder({ comentarioIndex, publicacionId, setComentari
     if (!respuesta.trim()) return;
     setEnviando(true);
 
-    try {
-      const publicacionRef = doc(db, 'Publicaciones', publicacionId);
-      const publicacionSnap = await getDoc(publicacionRef);
-      const data = publicacionSnap.exists() ? publicacionSnap.data() : {};
-      const comentariosActuales = Array.isArray(data?.comentarios) ? data.comentarios : [];
+    const nuevaRespuesta = await agregarRespuesta({
+      publicacionId,
+      comentarioId,
+      respuesta: {
+        texto: respuesta,
+        usuarioNombre: usuario.nombre,
+        usuarioFotoURL: usuario.fotoURL
+      }
+    });
 
-      const actualizado = [...comentariosActuales];
-      const comentario = actualizado[comentarioIndex];
+    if (nuevaRespuesta) {
+      // Añadir la respuesta visualmente al estado
+      setRespuestasPorComentario(prev => ({
+        ...prev,
+        [comentarioId]: [...(prev[comentarioId] || []), { ...nuevaRespuesta, _recienAgregado: true }]
+      }));
 
-      if (!comentario) throw new Error("Comentario no encontrado.");
-
-      const respuestasActuales = Array.isArray(comentario.respuestas) ? comentario.respuestas : [];
-      const nuevoComentario = {
-        ...comentario,
-        respuestas: [...respuestasActuales, respuesta]
-      };
-
-      actualizado[comentarioIndex] = nuevoComentario;
-
-      await setDoc(publicacionRef, { comentarios: actualizado }, { merge: true });
-
-      setComentariosLocal(actualizado);
-      setRespuesta('');
       setMostrarInput(false);
-    } catch (e) {
-      console.error("Error al responder:", e);
-    } finally {
-      setEnviando(false);
+      setRespuesta('');
     }
+
+
+    setEnviando(false);
   };
 
   return (

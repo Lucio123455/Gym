@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './Encabezado.module.css';
+import { formatearFecha } from '../../../../../../../utils/fecha';
 
 export default function Encabezado({ usuario,publicacion, eliminarPublicacion, fecha }) {
   return (
@@ -16,7 +17,7 @@ export default function Encabezado({ usuario,publicacion, eliminarPublicacion, f
 
       <div className={styles.fechaYBoton}>
         <span className={styles.fecha}>
-          {new Date(fecha).toLocaleDateString()}
+          {formatearFecha(fecha)}
         </span>
 
         {usuario?.role === 'admin' && (

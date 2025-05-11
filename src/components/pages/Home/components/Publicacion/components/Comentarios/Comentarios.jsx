@@ -1,9 +1,13 @@
 import React from 'react';
 import Responder from './Responder/Responder';
 import styles from './Comentarios.module.css';
+import { useEffect } from 'react';
+import { formatearFecha } from '../../../../../../../utils/fecha';
 
 export default function Comentarios({
+  respuestasPorComentario,
   comentarios,
+  setRespuestasPorComentario,
   mostrar,
   setMostrar,
   animar,
@@ -14,6 +18,7 @@ export default function Comentarios({
   eliminarComentario
 }) {
   if (!comentarios.length) return null;
+  const [comentarioEliminando, setComentarioEliminando] = React.useState(null);
 
   return (
     <div className={styles.comentarios}>
@@ -31,7 +36,10 @@ export default function Comentarios({
             className={`${styles.comentariosAnimados} ${animar ? styles.activo : ''}`}
           >
             {comentarios.map((comentario, index) => (
-              <div key={index} className={styles.comentario}>
+              <div
+                key={comentario.id}
+                className={`${styles.comentario} ${comentarioEliminando === comentario.id ? styles.oculto : ''}`}
+              >
                 <div className={styles.avatarComentario}>
                   {comentario.usuarioFotoURL ? (
                     <img
@@ -52,13 +60,25 @@ export default function Comentarios({
                       {comentario.usuarioNombre}
                     </span>
                     <span className={styles.fechaComentario}>
-                      {new Date(comentario.fecha).toLocaleDateString('es-AR')}
+                      {formatearFecha(comentario.fecha)}
                     </span>
 
                     {usuario?.role === 'admin' && (
                       <button
                         className={styles.eliminarComentario}
-                        onClick={() => eliminarComentario(index)}
+                        onClick={() => {
+                          setComentarioEliminando(comentario.id);
+
+                          setTimeout(() => {
+                            // Primero actualizamos el estado local directamente
+                            setComentariosLocal((prev) => prev.filter((c) => c.id !== comentario.id));
+
+                            // Luego llamamos al handler para que borre en Firestore
+                            eliminarComentario(comentario.id);
+                            setComentarioEliminando(null);
+                          }, 300);
+                        }}
+
                         title="Eliminar comentario"
                       >
                         ✖
@@ -68,32 +88,41 @@ export default function Comentarios({
 
                   <p className={styles.textoComentario}>{comentario.texto}</p>
 
-                  {comentario.respuestas?.map((resp, i) => (
-                    <div key={i} className={styles.comentario}>
+                  {(respuestasPorComentario[comentario.id] || []).map((resp) => (
+
+                    <div key={resp.id} className={`${styles.comentario} ${resp._recienAgregado ? styles.nuevo : ''}`}>
                       <div className={styles.avatarComentario}>
-                        <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzPs0ng1OihF-_SsKH3o2j2ThKJa21zWYlmg&s"
-                          alt="Avatar"
-                          className={styles.avatarComentarioImg}
-                        />
+                        {resp.usuarioFotoURL ? (
+                          <img
+                            src={resp.usuarioFotoURL}
+                            alt="Avatar"
+                            className={styles.avatarComentarioImg}
+                          />
+                        ) : (
+                          <span className={styles.inicialComentario}>
+                            {resp.usuarioNombre?.[0] || 'U'}
+                          </span>
+                        )}
                       </div>
                       <div className={styles.cuerpoComentario}>
                         <div className={styles.comentarioHeader}>
-                          <span className={styles.usuarioComentario}>Will Power Gym</span>
+                          <span className={styles.usuarioComentario}>{resp.usuarioNombre}</span>
                           <span className={styles.fechaComentario}>
-                            {new Date().toLocaleDateString('es-AR')}
+                            {formatearFecha(resp.fecha)}
                           </span>
                         </div>
-                        <p className={styles.textoComentario}>{resp}</p>
+                        <p className={styles.textoComentario}>{resp.texto}</p>
                       </div>
                     </div>
                   ))}
 
+
                   {usuario?.role === 'admin' && (
                     <Responder
-                      comentarioIndex={index}
+                      comentarioId={comentario.id}
                       publicacionId={publicacionId}
-                      setComentariosLocal={setComentariosLocal}
+                      setRespuestasPorComentario={setRespuestasPorComentario}
+                      usuario={usuario}
                     />
                   )}
                 </div>

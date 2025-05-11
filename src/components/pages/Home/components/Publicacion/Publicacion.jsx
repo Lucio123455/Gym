@@ -8,8 +8,10 @@ import {
 import { db } from '../../../../../firebase/config';
 import styles from './Publicacion.module.css';
 import {
-  agregarComentarioEnPublicacion,
-  eliminarPublicacion
+  agregarComentario,
+  eliminarPublicacion,
+  eliminarComentario
+
 } from '../../../../../services/publicaciones';
 import { confirmDeletionDialog, showToastSuccess, showToastError } from '../../../../../utils/AlertService.js'
 
@@ -19,12 +21,16 @@ import Descripcion from './components/Descripcion/Descripcion.jsx';
 import Comentarios from './components/Comentarios/Comentarios.jsx';
 import AgregarComentario from './components/AgregarComentario/AgregarComentario.jsx';
 
-function Publicacion({ publicacion, usuario, mutedGlobal,setMutedGlobal }) {
+function Publicacion({ publicacion, usuario, mutedGlobal, setMutedGlobal }) {
   const [nuevoComentario, setNuevoComentario] = useState('');
   const [mostrarComentarios, setMostrarComentarios] = useState(false);
   const [animarComentarios, setAnimarComentarios] = useState(false);
   const [loadingComentario, setLoadingComentario] = useState(false);
   const [comentariosLocal, setComentariosLocal] = useState([]);
+  const [ocultar, setOcultar] = useState(false);
+  const [respuestasPorComentario, setRespuestasPorComentario] = useState({});
+
+
   const comentariosRef = useRef(null);
 
   useEffect(() => {
@@ -48,14 +54,58 @@ function Publicacion({ publicacion, usuario, mutedGlobal,setMutedGlobal }) {
     fetchComentarios();
   }, [publicacion.id]);
 
-  const agregarComentario = () =>
-    agregarComentarioEnPublicacion({
+  useEffect(() => {
+  const cargarRespuestas = async () => {
+    const nuevasRespuestas = {};
+
+    for (const comentario of comentariosLocal) {
+      const snap = await getDocs(
+        collection(db, 'Publicaciones', publicacion.id, 'comentarios', comentario.id, 'respuestas')
+      );
+      nuevasRespuestas[comentario.id] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    setRespuestasPorComentario(nuevasRespuestas);
+  };
+
+  if (comentariosLocal.length > 0) {
+    cargarRespuestas();
+  }
+}, [comentariosLocal]);
+
+
+  const eliminarComentarioHandler = async (comentarioId) => {
+    const ok = await eliminarComentario(publicacion.id, comentarioId);
+
+    if (ok) {
+      setComentariosLocal((prev) => prev.filter(c => c.id !== comentarioId));
+      showToastSuccess('Comentario eliminado');
+    } else {
+      showToastError('No se pudo eliminar el comentario');
+    }
+  };
+
+  const agregarComentarioHandler = async () => {
+    if (loadingComentario) return;
+
+    setLoadingComentario(true);
+
+    const nuevo = await agregarComentario({
       publicacionId: publicacion.id,
       texto: nuevoComentario,
-      usuario,
-      setLoading: setLoadingComentario,
-      setNuevoComentario
+      usuario
     });
+
+    if (nuevo) {
+      setComentariosLocal((prev) => [...prev, nuevo]);
+      setNuevoComentario('');
+    }
+
+    setMostrarComentarios(true)
+    setLoadingComentario(false);
+  };
+
+
 
   const eliminarPublicacionHandler = async () => {
     const confirmado = await confirmDeletionDialog(
@@ -65,27 +115,31 @@ function Publicacion({ publicacion, usuario, mutedGlobal,setMutedGlobal }) {
 
     if (!confirmado) return;
 
-    const ok = await eliminarPublicacion(publicacion.id);
+    // 🔁 Activar animación
+    setOcultar(true);
 
-    if (ok) {
-      showToastSuccess('Publicación eliminada');
-      setTimeout(() => {
-        window.location.reload();
-      }, 800);
-    } else {
-      showToastError('No se pudo eliminar la publicación');
-    }
+    setTimeout(async () => {
+      const ok = await eliminarPublicacion(publicacion.id);
+
+      if (ok) {
+        showToastSuccess('Publicación eliminada');
+        // 🔁 Si usás setPublicaciones afuera, acá podés avisar con callback
+      } else {
+        showToastError('No se pudo eliminar la publicación');
+        setOcultar(false); // volver a mostrar si falló
+      }
+    }, 300); // tiempo de animación
   };
 
-
-
   return (
-    <div className={styles.publicacionContainer}>
+    <div className={`${styles.publicacionContainer} ${ocultar ? styles.publicacionOculta : ''}`}>
       <Encabezado usuario={usuario} publicacion={publicacion} eliminarPublicacion={eliminarPublicacionHandler} fecha={publicacion.fecha} />
       <ImagenPublicacion src={publicacion.imagen} videoUrl={publicacion.video} alt={`Publicación de ${publicacion.autor}`} mutedGlobal={mutedGlobal} setMutedGlobal={setMutedGlobal} />
       <Descripcion texto={publicacion.descripcion} />
       <Comentarios
         comentarios={comentariosLocal}
+        respuestasPorComentario={respuestasPorComentario}
+        setRespuestasPorComentario={setRespuestasPorComentario}
         mostrar={mostrarComentarios}
         setMostrar={setMostrarComentarios}
         animar={animarComentarios}
@@ -93,11 +147,12 @@ function Publicacion({ publicacion, usuario, mutedGlobal,setMutedGlobal }) {
         publicacionId={publicacion.id}
         setComentariosLocal={setComentariosLocal}
         usuario={usuario}
+        eliminarComentario={eliminarComentarioHandler}
       />
       <AgregarComentario
         nuevoComentario={nuevoComentario}
         setNuevoComentario={setNuevoComentario}
-        agregarComentario={agregarComentario}
+        agregarComentario={agregarComentarioHandler}
         loading={loadingComentario}
       />
     </div>

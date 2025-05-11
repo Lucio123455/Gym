@@ -15,32 +15,66 @@ export const getPublicaciones = async () => {
   return data.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 };
 
-export const agregarComentarioEnPublicacion = async ({
-  publicacionId,
-  texto,
-  usuario,
-  setLoading,
-  setNuevoComentario
-}) => {
-  if (!texto.trim()) return;
+export const agregarRespuesta = async ({ publicacionId, comentarioId, respuesta }) => {
+  const nueva = {
+    texto: respuesta.texto.trim(),
+    usuarioNombre: respuesta.usuarioNombre || 'Anónimo',
+    usuarioFotoURL: respuesta.usuarioFotoURL || '',
+    fecha: new Date() // fecha local para mostrar ya mismo
+  };
 
-  setLoading(true);
   try {
-    const nuevo = {
-      texto,
-      usuarioId: usuario.id || 'desconocido',
-      usuarioNombre: usuario.nombre || 'Anónimo',
-      fecha: serverTimestamp(),
-      respuestas: []
-    };
+    const ref = await addDoc(
+      collection(db, 'Publicaciones', publicacionId, 'comentarios', comentarioId, 'respuestas'),
+      { ...nueva, fecha: serverTimestamp() } // en BD usamos la real
+    );
 
-    await addDoc(collection(db, 'Publicaciones', publicacionId, 'comentarios'), nuevo);
-    setNuevoComentario('');
+    return { id: ref.id, ...nueva };
+  } catch (e) {
+    console.error("Error al responder:", e);
+    return null;
+  }
+};
+
+
+export const eliminarComentario = async (publicacionId, comentarioId) => {
+  if (!publicacionId || !comentarioId) return false;
+
+  try {
+    const comentarioRef = doc(db, 'Publicaciones', publicacionId, 'comentarios', comentarioId);
+    await deleteDoc(comentarioRef);
+    return true;
   } catch (error) {
-    console.error("Error al agregar comentario:", error);
-    mostrarError("No se pudo agregar el comentario.");
-  } finally {
-    setLoading(false);
+    console.error('Error al eliminar el comentario:', error);
+    return false;
+  }
+};
+
+export const agregarComentario = async ({ publicacionId, texto, usuario }) => {
+  if (!texto.trim()) return null;
+
+  const nuevoComentario = {
+    texto: texto.trim(),
+    usuarioId: usuario?.uid || 'sin-uid',
+    usuarioNombre: usuario.nombre,
+    usuarioFotoURL: usuario.fotoURL || '',
+    fecha: new Date(), // para mostrarlo al instante
+    respuestas: []
+  };
+
+  try {
+    const docRef = await addDoc(
+      collection(db, 'Publicaciones', publicacionId, 'comentarios'),
+      {
+        ...nuevoComentario,
+        fecha: serverTimestamp() // Firestore lo va a sobreescribir
+      }
+    );
+
+    return { id: docRef.id, ...nuevoComentario };
+  } catch (error) {
+    console.error('Error al agregar comentario:', error);
+    return null;
   }
 };
 
