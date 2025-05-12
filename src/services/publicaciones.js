@@ -6,8 +6,13 @@ import {
   collection,
   getDocs,
   doc,
-  deleteDoc
+  deleteDoc,
+  getDoc
 } from '../firebase/config.js';
+
+import { getAuth } from 'firebase/auth';
+
+
 
 export const getPublicaciones = async () => {
   const snap = await getDocs(collection(db, 'Publicaciones'));
@@ -15,11 +20,33 @@ export const getPublicaciones = async () => {
   return data.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 };
 
+export const obtenerFotoDeUsuario = async (uid) => {
+  if (!uid) return null;
+
+  try {
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) return null;
+
+    const data = snap.data();
+    console.log(data.fotoURL)
+    return data.fotoURL || null;
+  } catch (error) {
+    console.error("Error al obtener foto de usuario:", error);
+    return null;
+  }
+  
+};
+
+
 export const agregarRespuesta = async ({ publicacionId, comentarioId, respuesta }) => {
+  const uid = getAuth().currentUser?.uid || 'sin-id'; // ✅ esto es dinámico
+  
   const nueva = {
     texto: respuesta.texto.trim(),
     usuarioNombre: respuesta.usuarioNombre || 'Anónimo',
-    usuarioFotoURL: respuesta.usuarioFotoURL || '',
+    usuarioId: uid,
     fecha: new Date() // fecha local para mostrar ya mismo
   };
 
@@ -53,12 +80,13 @@ export const eliminarComentario = async (publicacionId, comentarioId) => {
 export const agregarComentario = async ({ publicacionId, texto, usuario }) => {
   if (!texto.trim()) return null;
 
+  const uid = getAuth().currentUser?.uid || 'sin-id'; // ✅ esto es dinámico
+
   const nuevoComentario = {
     texto: texto.trim(),
-    usuarioId: usuario?.uid || 'sin-uid',
+    usuarioId: uid,
     usuarioNombre: usuario.nombre,
-    usuarioFotoURL: usuario.fotoURL || '',
-    fecha: new Date(), // para mostrarlo al instante
+    fecha: new Date(), // UX inmediata
     respuestas: []
   };
 
@@ -67,7 +95,7 @@ export const agregarComentario = async ({ publicacionId, texto, usuario }) => {
       collection(db, 'Publicaciones', publicacionId, 'comentarios'),
       {
         ...nuevoComentario,
-        fecha: serverTimestamp() // Firestore lo va a sobreescribir
+        fecha: serverTimestamp() // timestamp real
       }
     );
 
@@ -77,6 +105,7 @@ export const agregarComentario = async ({ publicacionId, texto, usuario }) => {
     return null;
   }
 };
+
 
 export const eliminarPublicacion = async (publicacionId) => {
   try {

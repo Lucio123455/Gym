@@ -8,7 +8,7 @@ import ChatWindow from './components/pages/Chat/ChatWindow/ChatWindow.jsx';
 import Entrenamiento from './components/pages/Entrenamiento/Entrenamiento.jsx';
 import Perfil from './components/pages/Perfil/Perfil.jsx';
 import AuthGate from './components/AuthGate/AuthGate';
-import AdminPanel from './components/pages/AdminPanel/AdminPanel';
+import CrearPublicacion from './components/pages/CrearPublicaion/CrearPublicacion.jsx';
 import Loading from './components/Loading/Loading.jsx'; // 💡 Importa el nuevo loader
 import Rutinas from './components/pages/Entrenamiento/components/Modulos/Rutinas/Rutinas.jsx';
 import Datos from './components/pages/Perfil/modulos/Datos/Datos.jsx';
@@ -47,7 +47,7 @@ function App() {
             <Route path="/chat/:chatId" element={<ChatWindow />} />
 
             {user?.role === 'admin' ? (
-              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/admin" element={<CrearPublicacion />} />
             ) : (
               <>
                 <Route path="/entrenamiento" element={<Entrenamiento />} />

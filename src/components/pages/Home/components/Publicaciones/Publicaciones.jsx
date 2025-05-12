@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Publicacion from '../Publicacion/Publicacion';
 import styles from './Publicaciones.module.css';
 

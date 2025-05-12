@@ -12,7 +12,7 @@ export const useAuth = () => {
       if (authUser) {
         const userDoc = await getDoc(doc(db, 'users', authUser.uid));
         setUser({
-          uid: authUser.uid,
+          id: authUser.uid, // ✅ este es el ID del documento y el UID del usuario
           email: authUser.email,
           ...userDoc.data()
         });
