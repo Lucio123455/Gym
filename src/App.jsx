@@ -9,11 +9,10 @@ import Entrenamiento from './components/pages/Entrenamiento/Entrenamiento.jsx';
 import Perfil from './components/pages/Perfil/Perfil.jsx';
 import AuthGate from './components/AuthGate/AuthGate';
 import CrearPublicacion from './components/pages/CrearPublicaion/CrearPublicacion.jsx';
-import Loading from './components/Loading/Loading.jsx'; // 💡 Importa el nuevo loader
+import Loading from './components/Loading/Loading.jsx';
 import Rutinas from './components/pages/Entrenamiento/components/Modulos/Rutinas/Rutinas.jsx';
 import Datos from './components/pages/Perfil/modulos/Datos/Datos.jsx';
 import { UsuarioProvider } from './context/UsuarioContext.jsx';
-import { usePublicaciones } from './hooks/usePublicaiones.js';
 
 function AppWrapper() {
   return (
@@ -31,10 +30,10 @@ function App() {
 
   const isFullScreenView = (
     (location.pathname.startsWith('/chat/') && location.pathname !== '/chat') ||
-    location.pathname === '/admin'
+    location.pathname === '/crear-publicaciones'
   );
 
-  if (loading) return <Loading />; // 🎯 Nuevo loader aplicado
+  if (loading) return <Loading />;
 
   return (
     <>
@@ -49,15 +48,19 @@ function App() {
             <Route path="/chat" element={<ChatList />} />
             <Route path="/chat/:chatId" element={<ChatWindow />} />
 
-            {user?.role === 'admin' ? (
-              <Route path="/admin" element={<CrearPublicacion />} />
-            ) : (
+            {user?.role === 'admin' && (
+              <Route path="/crear-publicaciones" element={<CrearPublicacion />} />
+            )}
+
+            {/* Todos los usuarios logueados pueden ver perfil */}
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/perfil/datos" element={<Datos />} />
+
+            {/* Solo para clientes */}
+            {user?.role !== 'admin' && (
               <>
                 <Route path="/entrenamiento" element={<Entrenamiento />} />
                 <Route path="/entrenamiento/rutinas" element={<Rutinas />} />
-
-                <Route path="/perfil" element={<Perfil />} />
-                <Route path="/perfil/datos" element={<Datos />} />
               </>
             )}
 
@@ -72,3 +75,4 @@ function App() {
 }
 
 export default AppWrapper;
+
