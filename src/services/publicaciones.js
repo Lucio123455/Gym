@@ -13,12 +13,14 @@ import {
 import { getAuth } from 'firebase/auth';
 
 export const crearPublicacion = async ({ descripcion, mediaUrl, mediaType, usuario }) => {
+    const uid = getAuth().currentUser?.uid || 'sin-id'; // ✅ esto es dinámico
+
   try {
     const nuevaPublicacion = {
       descripcion,
       fecha: new Date().toISOString(),
       autor: usuario.nombre,
-      fotoURL: usuario.fotoURL,
+      usuarioId: uid,
       imagen: mediaType === 'image' ? mediaUrl : '',
       video: mediaType === 'video' ? mediaUrl : ''
     };
