@@ -1,123 +1,153 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // si no lo tenés aún
 import { useAuth } from '../../../hooks/useAuth';
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../../../firebase/config';
 import styles from './CrearPublicacion.module.css';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { crearPublicacion } from '../../../services/publicaciones';
+import { showToastSuccess, showToastError } from '../../../utils/AlertService';
 
 export default function CrearPublicacion() {
-    const { user } = useAuth();
-    const [formData, setFormData] = useState({
-        descripcion: '',
-        mediaUrl: ''
+  const galeriaSimulada = [
+    { type: 'image', url: 'https://picsum.photos/id/10/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/11/400/400' },
+    { type: 'video', url: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+    { type: 'image', url: 'https://picsum.photos/id/14/400/400' },
+    { type: 'video', url: 'https://www.w3schools.com/html/movie.mp4' },
+    { type: 'image', url: 'https://picsum.photos/id/17/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/20/400/400' },
+    { type: 'video', url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' },
+    { type: 'image', url: 'https://picsum.photos/id/21/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/22/400/400' },
+    { type: 'video', url: 'https://media.w3.org/2010/05/sintel/trailer.mp4' },
+    { type: 'image', url: 'https://picsum.photos/id/23/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/24/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/25/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/26/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/27/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/28/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/29/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/30/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/31/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/32/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/33/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/34/400/400' },
+    { type: 'image', url: 'https://picsum.photos/id/35/400/400' }
+  ];
+  const [step, setStep] = useState(1);
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  const [formData, setFormData] = useState({
+    descripcion: '',
+    mediaUrl: galeriaSimulada[0].url,
+    mediaType: galeriaSimulada[0].type
+  });
+
+  const nuevaPublicacionHandler = async () => {
+    if (!formData.mediaUrl || !formData.descripcion.trim()) {
+      toast.error("Completá la descripción y seleccioná una imagen o video.");
+      return;
+    }
+
+    const res = await crearPublicacion({
+      descripcion: formData.descripcion,
+      mediaUrl: formData.mediaUrl,
+      mediaType: formData.mediaType,
+      usuario: user
     });
 
-    const galeriaSimulada = [
-        'https://picsum.photos/id/1015/400/400',
-        'https://picsum.photos/id/1065/400/400',
-        'https://picsum.photos/id/1035/400/400',
-        'https://picsum.photos/id/1040/400/400',
-        'https://picsum.photos/id/1050/400/400',
-        'https://picsum.photos/id/1065/400/400',
-    ];
+    if (res.success) {
+      showToastSuccess("Publicación creada con éxito");
+      navigate('/');
+    } else {
+      showToastError("Error al crear la publicación");
+    }
+  };
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-
-        try {
-            const mediaUrl = formData.mediaUrl.trim();
-            const isYouTube = mediaUrl.includes('youtube');
-            const isVideo = isYouTube || /(\.mp4|\.webm|\.ogg)(\?.*)?$/i.test(mediaUrl);
-            const isImage = /(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.webp)(\?.*)?$/i.test(mediaUrl);
-
-
-            const nuevaPublicacion = {
-                descripcion: formData.descripcion,
-                imagen: isImage ? mediaUrl : '',
-                video: isVideo ? mediaUrl : '',
-                fecha: new Date().toISOString(),
-                autor: user.nombre,
-                fotoURL: user.fotoURL,
-                likes: 0,
-                comentarios: []
-            };
-
-            await addDoc(collection(db, 'Publicaciones'), nuevaPublicacion);
-
-            toast.success('Publicación creada exitosamente!');
-            setFormData({
-                descripcion: '',
-                mediaUrl: ''
-            });
-        } catch (err) {
-            console.error("Error al crear publicación:", err);
-            toast.error('Error al crear la publicación');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-
-    return (
-  <div className={styles.container}>
-    {formData.mediaUrl && (
-      <div className={styles.mediaPreview}>
-        <img src={formData.mediaUrl} alt="Preview seleccionada" />
-      </div>
-    )}
-
-    <div className={styles.galeriaSimulada}>
-      {galeriaSimulada.map((url, i) => (
-        <img
-          key={i}
-          src={url}
-          alt={`img-${i}`}
-          onClick={() => setFormData({ ...formData, mediaUrl: url })}
-          className={`${styles.thumb} ${formData.mediaUrl === url ? styles.selected : ''}`}
-        />
-      ))}
-    </div>
-
-    {formData.mediaUrl && (
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.formGroup}>
-          <textarea
-            id="descripcion"
-            name="descripcion"
-            value={formData.descripcion}
-            onChange={handleChange}
-            required
-            rows={3}
-            disabled={isSubmitting}
-            placeholder="¿Qué estás pensando?"
-            className={styles.textarea}
-          />
-        </div>
-
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <span className={styles.headerTitle}>Nueva publicación</span>
         <button
-          type="submit"
-          disabled={isSubmitting}
-          className={styles.submitButton}
+          className={styles.headerButton}
+          onClick={() => setStep(2)}
         >
-          {isSubmitting ? 'Publicando...' : 'Continuar'}
+          Siguiente
         </button>
-      </form>
-    )}
-  </div>
-);
+      </div>
 
 
 
+      {step === 1 && (
+        <>
+          {formData.mediaUrl && (
+            <div className={styles.mediaPreview}>
+              {formData.mediaType === 'video' ? (
+                <video width="100%" height="100%" controls>
+                  <source src={formData.mediaUrl} />
+                  Tu navegador no soporta el video.
+                </video>
+              ) : (
+                <img src={formData.mediaUrl} alt="Preview seleccionada" />
+              )}
+            </div>
+          )}
+
+          <div className={styles.galeriaSimulada}>
+            {galeriaSimulada.map((item, i) => (
+              <div
+                key={i}
+                className={`${styles.thumbWrapper} ${formData.mediaUrl === item.url ? styles.selected : ''}`}
+                onClick={() =>
+                  setFormData({ ...formData, mediaUrl: item.url, mediaType: item.type })
+                }
+              >
+                {item.type === 'video' ? (
+                  <>
+                    <video className={styles.thumbVideo} muted>
+                      <source src={item.url} />
+                    </video>
+                    <div className={styles.playOverlay}>▶</div>
+                  </>
+                ) : (
+                  <img src={item.url} alt={`img-${i}`} className={styles.thumb} />
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      {step === 2 && (
+        <div className={styles.publicarContainer}>
+          <div className={styles.mediaFinalPreview}>
+            {formData.mediaType === 'video' ? (
+              <video width="100%" height="100%" controls>
+                <source src={formData.mediaUrl} />
+                Tu navegador no soporta el video.
+              </video>
+            ) : (
+              <img src={formData.mediaUrl} alt="Preview final" />
+            )}
+          </div>
+
+          <textarea
+            placeholder="Escribí una descripción..."
+            value={formData.descripcion}
+            onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
+            className={styles.descripcionTextarea}
+            rows={3}
+          />
+
+          <button
+            className={styles.publicarButton}
+            onClick={nuevaPublicacionHandler}
+          >
+            Publicar
+          </button>
+        </div>
+      )}
+
+
+    </div>
+  );
 }
+

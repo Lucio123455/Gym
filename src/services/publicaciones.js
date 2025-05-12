@@ -12,7 +12,24 @@ import {
 
 import { getAuth } from 'firebase/auth';
 
+export const crearPublicacion = async ({ descripcion, mediaUrl, mediaType, usuario }) => {
+  try {
+    const nuevaPublicacion = {
+      descripcion,
+      fecha: new Date().toISOString(),
+      autor: usuario.nombre,
+      fotoURL: usuario.fotoURL,
+      imagen: mediaType === 'image' ? mediaUrl : '',
+      video: mediaType === 'video' ? mediaUrl : ''
+    };
 
+    await addDoc(collection(db, 'Publicaciones'), nuevaPublicacion);
+    return { success: true };
+  } catch (error) {
+    console.error('Error al crear publicación:', error);
+    return { success: false, error };
+  }
+};
 
 export const getPublicaciones = async () => {
   const snap = await getDocs(collection(db, 'Publicaciones'));

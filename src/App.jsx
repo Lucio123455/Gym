@@ -29,7 +29,10 @@ function App() {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  const isChatWindow = location.pathname.startsWith('/chat/') && location.pathname !== '/chat';
+  const isFullScreenView = (
+    (location.pathname.startsWith('/chat/') && location.pathname !== '/chat') ||
+    location.pathname === '/admin'
+  );
 
   if (loading) return <Loading />; // 🎯 Nuevo loader aplicado
 
@@ -39,7 +42,7 @@ function App() {
         <AuthGate />
       ) : (
         <>
-          {!isChatWindow && <Header />}
+          {!isFullScreenView && <Header />}
 
           <Routes>
             <Route path="/" element={<Home />} />
@@ -61,7 +64,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
 
-          {!isChatWindow && <Navbar />}
+          {!isFullScreenView && <Navbar />}
         </>
       )}
     </>

@@ -81,7 +81,7 @@ export default function ImagenPublicacion({ src, alt, videoUrl, mutedGlobal, set
 
   return (
     <div className={styles.contenidoImagen}>
-      {src && esImagen(src) && (
+      {src && (
         <img src={src} className={styles.imagen} alt={alt} />
       )}
 
