@@ -62,8 +62,8 @@ export default function ImagenPublicacion({ src, alt, videoUrl, mutedGlobal, set
     if (!video) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setEstaVisible(entry.intersectionRatio === 1),
-      { threshold: 1.0 } // 🔒 solo si está completamente visible
+      ([entry]) => setEstaVisible(entry.intersectionRatio >= 0.6),
+      { threshold: [0.6] } // 🔒 solo si está completamente visible
     );
 
 
@@ -78,6 +78,19 @@ export default function ImagenPublicacion({ src, alt, videoUrl, mutedGlobal, set
       video.muted = mutedGlobal || !estaVisible;
     }
   }, [mutedGlobal, estaVisible]);
+
+  // reproducir/pausar automáticamente según visibilidad
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (estaVisible) {
+      video.play().catch(() => { });
+    } else {
+      video.pause();
+    }
+  }, [estaVisible]);
+
 
   return (
     <div className={styles.contenidoImagen}>
